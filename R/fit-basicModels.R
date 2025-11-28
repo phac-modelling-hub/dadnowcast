@@ -1,8 +1,9 @@
 #' Fit a basic indicated model
 #'
 #' @param formula A formula indicating which variables to use in the model
-#' @param model A string indicating the type of model to be fit to the data
-#' @param data A data frame containg at least the data to be used
+#' @param model A string indicating the type of model to be fit to the data, can be linear or AR
+#' @param data A data frame containing at least the data to be used
+#' @param n An optional argument indicating the order of the AR model to be used
 #'
 #' @return The specified model based on the given formula
 #'
@@ -12,9 +13,12 @@
 #' y <- rnorm(100)
 #' x <- seq(1,100)
 #' df <- data.frame(x,y)
-#' fit-basicModels(y ~ x, model = "AR", df)
+#' fit-basicModels(y ~ x, model = "linear", df)
 
-fit_basicModels <- function(formula, model, data) {
+fit_basicModels <- function(formula, model, data, n = 1) {
+  if (model == "AR") {
+    return(arima(formula, order = c(n, 0, 0)))
+  }
   # obtain variables for the left and righthand side of the given formula
   lhs <- formula[[2]]
   rhs <- formula[[3]]
@@ -29,20 +33,29 @@ fit_basicModels <- function(formula, model, data) {
   # determine the number of variables in the righthand side of the formula
   rhsVars <- all.vars(rhs)
   numRhsVars <- length(rhsVars)
-  
+
   # detect if all variables used in the righthand side are in the given data
   rhs_data <- data.frame(matrix(nrow = length(lhs_data), ncol = numRhsVars))
-  #print(c(length(lhs_data), numRhsVars))
-  
+  # print(c(length(lhs_data), numRhsVars))
+
   for (i in seq(1:numRhsVars)) {
     if (as.character(rhsVars[i]) %in% colnames(data)) {
-      rhs_data[,i] <- data[, which(colnames(data) == rhsVars[i])]
+      rhs_data[, i] <- data[, which(colnames(data) == rhsVars[i])]
     } else {
       return(paste("Variable", rhsVars[i], "not found"))
     }
   }
-  
-  colnames(rhs_data) <- rhsVars
-  
-  rhs_data
+
+  usedData <- cbind(lhs_data, rhs_data)
+
+  colnames(usedData) <- c(lhs, rhsVars)
+
+  usedData
+
+  # create and return the specified models
+  if (model == "linear") {
+    lm(formula, data = usedData)
+  } else {
+    return("Model not recognized")
+  }
 }
