@@ -1,9 +1,50 @@
+#' Fit a simple linear model (internal)
+#' 
+#' @param x The single covariate vector.
+#' @param y The response vector.
+fit_simple_lm <- function(x, y) {
+  lm (y ~ x)
+}
+
+#' Fit a simple ARX model (internal)
+#' 
+#' @inheritParams fit_simple_lm
+#' @param order The order of the AR(p) process.
+fit_simple_arx <- function(x, y, order = 1) {
+  arima(y, order = c(order, 0, 0), xreg = x)
+}
+
+#' Fit a simple (on covariate) regression model
+#' 
+#' @param formula y ~ x
+#' @param data A data frame with columns used in the formula.
+#' @param model Currently implemented: "lm" and "ar"
+#' @param order The AR order to be used in `arima()`.
+#' 
+#' @returns A model object for which a predict method exists. 
+fit_simple_model <- function(
+    formula, data,
+    model = c("lm", "ar")[1],
+    order = NULL
+) {
+  y <- data[, all.vars(formula[[2]])]
+  # TODO: Error checking for number of covariates.
+    # Alternative: allow an arbitrary number of covariates.
+  x <- data[, all.vars(formula[[3]])]
+  model_res <- switch(model,
+    "lm" = fit_simple_lm(x, y),
+    "ar" = fit_simple_arx(x, y, order)
+  )
+
+  model_res
+}
+
 #' Fit a basic indicated model
 #'
 #' @param formula A formula indicating which variables to use in the model
 #' @param model A string indicating the type of model to be fit to the data, can be linear or AR
 #' @param data A data frame containing at least the data to be used
-#' @param n An optional argument indicating the order of the AR model to be used
+#' @param ar_order An optional argument indicating the order of the AR model to be used
 #'
 #' @return The specified model based on the given formula
 #'
@@ -15,12 +56,13 @@
 #' df <- data.frame(x,y)
 #' fit-basicModels(y ~ x, model = "linear", df)
 
-fit_basicModels <- function(formula, model, data, n = 1) {
+fit_basic_models <- function(formula, model, data, ar_order = 1) {
   if (!(model %in% c("AR","linear"))) {
-    return("Model not recognized")
+    stop("Model not recognized")
   } else if (model == "AR") {
-    return(arima(formula, order = c(n, 0, 0)))
-  } else {
+    return(arima(formula, order = c(ar_order, 0, 0)))
+  }
+
   # obtain variables for the left and righthand side of the given formula
   lhs <- formula[[2]]
   rhs <- formula[[3]]
@@ -52,7 +94,5 @@ fit_basicModels <- function(formula, model, data, n = 1) {
 
   colnames(usedData) <- c(lhs, rhsVars)
 
-  lm(formula, data = usedData)
-
-  }
+  lm(formula, data = data)
 }
