@@ -10,8 +10,8 @@ now_simple_lm <- function(newX, model) {
 #' 
 #' @param NewX The known x values to be nowcast on.
 #' @param model The model to use for predictions.
-now_simple_arx <- function(newX, model, nAhead) {
-  predict(model, newxreg = newX, n.ahead = nAhead)
+now_simple_arx <- function(newX, model) {
+  predict(model, newxreg = newX, n.ahead = length(newX))
 }
 
 #' Perform nowcasting for the specified response variable
@@ -42,6 +42,6 @@ now_simple_models <- function(
   
   switch (model,
     "lm" = now_simple_lm(newX, modToUse),
-    "ar" = now_simple_arx(newX, modToUse, length(newX))
+    "ar" = now_simple_arx(newX, modToUse)
   )
 }
