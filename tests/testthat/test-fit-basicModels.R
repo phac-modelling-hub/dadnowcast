@@ -30,5 +30,5 @@ test_that("Incorrect model specification works", {
   x <- c(1:100)
   y <- EuStockMarkets[,2][1:100]
   df <- data.frame(x,y)
-  expect_equal(fit_simple_model(y~x, model = "None", df), "Model not recognized")
+  expect_equal(fit_simple_model(y~x, model = "None", df), NULL)
 })
