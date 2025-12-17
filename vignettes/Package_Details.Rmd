@@ -1,0 +1,25 @@
+---
+title: "Package_Details"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Package_Details}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(fatherStay)
+```
+
+## Objective
+
+## Imputation
+
+We expect there to be some missing data in the predictor variables. Imputation is the best way to deal with them.

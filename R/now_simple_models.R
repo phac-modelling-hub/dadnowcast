@@ -39,16 +39,22 @@ now_simple_models <- function(
   y <- data[, all.vars(formula[[2]])]
   x <- data[, all.vars(formula[[3]])]
 
+  # find the number of NA values at the end of the response variable
   naCount <- find_nas(y)
+
+  # find the length of the non-NA values in the response variable
   numNonNa <- (length(y) - naCount)
+
+  # get a data frame for the non-NA response values
   shortData <- data[1:numNonNa, ]
 
+  # create the model to do predictions from
   modToUse <- fit_simple_model(formula, shortData, model, order)
 
-  # create predict part here that predicts naCount ahead
-
+  # get a data frame for the covariates of when the response variable is NA
   newX <- x[(numNonNa + 1):length(x)]
 
+  # perform the nowcasting
   switch(model,
     "lm" = now_simple_lm(newX, modToUse),
     "ar" = now_simple_arx(newX, modToUse)
