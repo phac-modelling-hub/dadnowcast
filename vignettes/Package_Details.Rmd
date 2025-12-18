@@ -41,7 +41,7 @@ Note the string of NA values in y in the last days of the study, which are the v
 
 ## Imputation
 
-We expect there to be some missing data in the predictor variables. Imputation is the best way to deal with them.
+We expect there to be some missing data in the predictor variables. Imputation is the best way to deal with them. The goal is that we will have relatively simple methods to impute the values of the explanatory variables $x_1$, $z_1$, and $z_2$, and the package will allow the user to specify the type of imputation to be used.
 
-
+## Nowcasting
 
