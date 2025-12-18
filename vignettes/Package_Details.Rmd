@@ -41,7 +41,11 @@ Note the string of NA values in y in the last days of the study, which are the v
 
 ## Imputation
 
-We expect there to be some missing data in the predictor variables. Imputation is the best way to deal with them. The goal is that we will have relatively simple methods to impute the values of the explanatory variables $x_1$, $z_1$, and $z_2$, and the package will allow the user to specify the type of imputation to be used.
+We expect there to be some missing data in the predictor variables. Imputation is the best way to deal with them. The goal is that we will have relatively simple methods to impute the values of the explanatory variables $x_1$, $z_1$, and $z_2$, and the package will allow the user to specify the type of imputation to be used. Additionally our data has the advantage of having multiple potentially correlated variables. We would ideally like to use this fact to our advantage when imputing the data. Imputation is not the main focus of this project and so we will be keeping the imputation methods used relatively simple. 
+
+There are several existing R packages that allow for imputation and work in a time series context, and while we do not want the program we are developing to be dependent on many packages it makes sense to use an existing package for the imputation since it is not a focus of the project. 
+
+The first is imputeTS, a package in R for imputing univariate time series. It has the advantage of being specifically for time series data. It features a variety of complex methods for imputation such as; Kalman smoothing, and interpolation, as well as simple methods like using the last observation or the mean. There is really only one main disadvantage of this package, it does not take advantage of the multivariate nature of our data, and as a result other packages and imputation methods may do a better job than imputeTS.
 
 ## Nowcasting
 
