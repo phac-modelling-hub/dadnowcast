@@ -39,7 +39,7 @@ We expect the data to have the following properties:
 
 We will implement a check function to ensure these are correctly specified:
 
-```r
+```{r}
 check_data(data, formula = NULL, date_col = NULL)
 ```
 
@@ -53,21 +53,21 @@ The formula will tell the function which variable is the response so we can prov
 
 There are several possible imputation strategies that we will implement, so this is split as a separate function.
 
-```r
+```{r}
 imputed_data <- data |>
 	impute(formula, date_col = NULL, method = "full_linear")
 ```
 
 Alternatively the composability allows for the following:
 
-```r
+```{r}
 imputed_data <- check_data(data, formula = y ~ x, date_col = "date") |>
 	impute(method = "full_linear")
 ```
 
 There will be an `autoplot()` method for imputed data, which shows the raw data and the predictions in a `ggplot2` object..
 
-```r
+```{r}
 autoplot(imputed_data) +
 	theme_bw()
 ```
@@ -76,7 +76,7 @@ autoplot(imputed_data) +
 
 The fitting function will take in the data and output a model object.
 
-```r
+```{r}
 fitted <- fit_model(data, formula, date_col, model = "lm", cv_strategy = "basic")
 
 fitted <- check_data(data, formula, date_col) |>
@@ -88,7 +88,7 @@ Ideally, the `method` argument will also accept a user-defined function that has
 
 The autoplot method will show relevant diagnostics depending on the model.
 
-```r
+```{r}
 autoplot(fitted)
 ```
 
@@ -96,7 +96,7 @@ There will also be a way to compare multiple fitted models for training set perf
 
 ### 4. Nowcast, with prediction intervals
 
-```r
+```{r}
 nowcasted <- nowcast(data, formula, date_col, model, measure, cv_strategy)
 
 
@@ -112,7 +112,7 @@ autoplot(nowcasted)
 
 Imagine if this was the entire workflow:
 
-```r
+```{r}
 multimodel <- data |>
 	check_data(
 		formula = list(
