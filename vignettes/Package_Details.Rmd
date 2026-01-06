@@ -53,6 +53,50 @@ For multivariate time series data a good package to use is MICE (multivariate im
 
 Starting with defining the specific problem that we are wanting to solve. When referring to nowcasting we denote the measurement of DAD at time $t$ by the value $Y_t$ and the measurements of the explanatory variables at time $t$ to be the values $X_{1,t}$ for RVDSS and $Z_{j,t}$ where $j \in \{1,2\}$ representing CNISP, and PTSOS. Then the problem that we are working is how to predict the value of $Y_t$ given the values $X_{1,t}$, $Z_{j,t}$, and $Y_{t-1}$.
 
-We will be making several key assumptions in this project. The first is that the data for the explanatory variables can be at least somewhat successfully imputed by reasonable estimates. We will also assume that we have access to all the updated values of the explanatory variables at the time $t$ when we are making a prediction for $Y_t$. 
+We will be making several key assumptions in this project. The first is that the data for the explanatory variables can be at least somewhat successfully imputed by reasonable estimates. We will also assume that we have access to all the updated values of the explanatory variables at the time $t$ when we are making a prediction for $Y_t$. <- Devan, is this a good/valid assumption to make?
 
-Devan, is this a good/valid assumption to make?
+There are several different techniques for nowcasting in a time series context:
+
+### Kalman filter/Smoothing
+
+A common method in nowcasting time series data is using the Kalman Filter (rossiKalmanFilteringBased2015). The Kalman filter predicts one step ahead and its algorithm works in two steps, first creating a prediction, and then after the actual data is observed, updating that prediction using the Kalman gain. This preserves the overall trend of the data, while also taking the actual values into account. The applications of this to nowcasting are that we would use the prediction step to nowcast the desired value (DAD) and then the prediction step would update the algorithm when more data is observed.
+
+A Kalman filter is capable of handling the multivariate nature of this data. The foundational equations that the Kalman filter is based on:
+$$
+y_t = ax_t + \epsilon_1 \\
+x_t = bx_{t-1} + \epsilon_2
+$$
+
+Can easily be changed to accommodate multiple predictors:
+
+$$
+y_t = ax_t + bz_t + \epsilon_1 \\
+x_t = cx_{t-1} + \epsilon_2 \\
+z_t = dz_{t-1} + \epsilon_3
+$$
+
+There are R packages that can be used to run a Kalman Filter such as kalmanfilter, however it may be easier for us to code our own functions for it so that they integrate well with the rest of the package.
+
+### Dynamic Factor Models
+
+Dynamic Factor Models are used frequently in the calculation of GDP and other economic variables. They make the assumption that our variable of interest depends on a number of explanatory variables that can in turn be modelled by AR models. This is a similar definition to the Kalman Filter, but this model doesn't have the update --> predict cycle and the Kalman gain.
+
+In this model we define our process to be some product of a lag matrix $L_1$ and a vector of factors $f_t$ plus a random error.
+$$
+y_t = L_1f_t + \epsilon_t
+$$
+The explanatory variables are dependent of previous iterations of themselves multiplied by a different lag matrix $L_2$, and a random error term.
+$$
+f_t = L_2f_{t-1} + \psi_t
+$$
+The main benefit of a dynamic factor model is that it allows for a dataset with many variables to be analysed more efficiently, but using only the factors and not all of the variables in the dataset. In this case we do not have a large number of factors, and so dynamic factor models may not be the best approach, but is still worth considering and comparing with other methods.
+(https://www.princeton.edu/~mwatson/papers/dfm_oup_4.pdf)
+
+### VAR & BVAR
+
+Vector Autoregression is used primarily for economic data. Uses the form:
+$$
+y_t = A_0 + x_{t-1}A_1 + \cdots + x_{t-p}A_p + \epsilon_t
+$$
+
+Bayesian Vector Autoregression models have the same structure, the difference comes in the method to estimate the variables. These methods can be computationally intensive so we will need to investigate if they are appropriate for the computation constraints of this project. (https://www.econstor.eu/bitstream/10419/319609/1/1927850754.pdf)
