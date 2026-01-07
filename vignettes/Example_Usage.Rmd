@@ -26,6 +26,7 @@ tail(df, 12) # last 10 are NA - to be nowcast!
 ```
 
 ```{r}
+now_simple_models(dad ~ npos, df, model = "lm")
 now_simple_models(dad ~ npos, df, model = "ar", order = 1)
 ```
 
