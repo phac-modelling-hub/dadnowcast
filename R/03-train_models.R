@@ -15,7 +15,7 @@ train_model <- function(dadnow, quiet = FALSE) {
 
   for (model in dadnow$model) {
     res <- switch(model,
-      "lm" = train_lm(dadnow$X_train, dadnow$y_train),
+      "lm" = train_lm(as.matrix(dadnow$X_train), dadnow$y_train),
       "ar" = train_ar(dadnow$X_train, dadnow$y_train, dadnow$order)
     )
     dadnow[[paste0("trained_", model)]] <- res
@@ -25,11 +25,10 @@ train_model <- function(dadnow, quiet = FALSE) {
 }
 
 train_lm <- function(X, y) {
-  formula <- y ~ X
-  lm(formula)
+  newdf <- data.frame(y = y, X)
+  lm(y ~ ., data = newdf)
 }
 
 train_ar <- function(X, y, order) {
-  data <- cbind(y, X)
   arima(y, order = c(order, 0, 0), xreg = X)
 }

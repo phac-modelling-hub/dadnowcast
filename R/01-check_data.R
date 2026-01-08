@@ -47,8 +47,8 @@ prep_data <- function(
   trailing_nas <- find_nas(y)
   num_non_na <- length(y) - trailing_nas
 
-  X_train <- data[1:num_non_na, covariates]
-  X_nowcast <- data[(num_non_na + 1):nrow(data), covariates]
+  X_train <- data[1:num_non_na, covariates, drop = FALSE]
+  X_nowcast <- data[(num_non_na + 1):nrow(data), covariates, drop = FALSE]
   y_train <- data[1:num_non_na, all.vars(formula)[1]]
   y_nowcast <- data[(num_non_na + 1):nrow(data), all.vars(formula)[1]]
 
