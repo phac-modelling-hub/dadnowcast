@@ -1,5 +1,5 @@
 ---
-title: "Package_Details"
+title: "Package Details"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Package_Details}
@@ -20,7 +20,7 @@ library(fatherStay)
 
 ## Objective
 
-Our data are expected to look something like the following:
+This package expects the data to look something like the following:
 
 | date       | y   | x1  | z1  | z2  |
 |------------|-----|-----|-----|-----|
@@ -37,9 +37,9 @@ Our data are expected to look something like the following:
 | 2020-12-30 | NA  | 0.4 | 2.0 | 3.9 |
 | 2020-12-31 | NA  | 0.2 | 1.0 | 3.8 |
 
-The date should be converted into a datetime object in R prior to use in this package, e.g. with `lubridate::ymd()`.
+The `date` should be converted into a datetime object in R prior to use in this package, e.g. with `lubridate::ymd()`. Note that the column names can be arbitrary.
 
-Note the string of NA values in y in the last days of the study, which are the values to be nowcasted. Note also the presence of NA values in the response and the predictors prior to nowcasting, which must be imputed for the methods we propose.
+Note the string of trailing NA values in y in the last days of the study, which the package interprets as the values to be nowcasted. Note also the presence of NA values in the response and the predictors prior to nowcasting, which must be imputed for many of the methods we propose.
 
 ## Imputation
 
@@ -114,7 +114,7 @@ The following assumptions lay the foundation of the mechanistic model:
     - $D \approx \eta R$, e.g. 20% of cases are hospitalized.
     - $\eta$ is the "virulence"
 2. The total admissions are a constant fraction of *each of* the provincial and national hospital data.
-    - $\hat s_c D \approx C$ and $ \hat s_p D \approx PTSOS$
+    - $\hat s_c D \approx C$ and $\hat s_p D \approx PTSOS$
     - $\hat s_c$ and $\hat s_p$ are the sampling rates, which are assumed to be known from historical data.
 
 This gives us three equations with parameters/error terms to be estimated simultaneously:
