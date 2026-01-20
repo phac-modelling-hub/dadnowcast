@@ -29,7 +29,8 @@ prep_data <- function(
     cat(
       "Date range:",
       format(min(lubridate::ymd(dates)), "%Y-%m-%d"), "to",
-      format(max(lubridate::ymd(dates)), "%Y-%m-%d"), "\n")
+      format(max(lubridate::ymd(dates)), "%Y-%m-%d"), "\n"
+    )
   }
   data <- data[order(data[, date_col]), ]
   diffs <- diff(data[, date_col])
