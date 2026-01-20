@@ -12,5 +12,9 @@ fit_LM <- function(YTrain,XTrain, XNowcast){
   full_data <- as.data.frame(cbind(YTrain,XTrain))
 
   fitted_LM <- lm(YTrain ~ ., data = full_data)
-  fitted_LM
+  # fitted_LM
+  XNowcast <- as.data.frame(XNowcast)
+  predicted_LM <- predict(fitted_LM, XNowcast)
+  
+  list(fitted_LM, predicted_LM)
 }
