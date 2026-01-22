@@ -18,5 +18,5 @@ fit_LM <- function(Y_train, X_train, X_nowcast) {
 
   predicted_LM <- predict(fitted_LM, newdata = XNowcast)
 
-  list(fitted_LM, predicted_LM)
+  list(model = fitted_LM, prediction = predicted_LM)
 }

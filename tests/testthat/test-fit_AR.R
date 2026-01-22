@@ -1,0 +1,10 @@
+test_that("fit simple AR model works", {
+  testY <- c(1.838, 0.382, -0.306, 2.185, 0.458, -2.366, -0.959, -1.014, -0.158, -2.133)
+  test_mod <- fit_AR(testY, p = 2, n.ahead = 5)
+  expect_equal(test_mod[[1]]$coef[[1]], 0.2423, tolerance = 0.001)
+  expect_equal(test_mod[[1]]$coef[[2]], -0.1160, tolerance = 0.001)
+  expect_equal(test_mod[[1]]$coef[[3]], -0.2140, tolerance = 0.001)
+  expect_equal(test_mod[[2]][[1]][1], -0.6855, tolerance = 0.001)
+  expect_equal(test_mod[[2]][[1]][2], -0.1056, tolerance = 0.001)
+  expect_equal(test_mod[[2]][[1]][3], -0.1330, tolerance = 0.001)
+})
