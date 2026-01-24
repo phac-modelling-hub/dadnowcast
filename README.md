@@ -21,6 +21,36 @@ For user-facing functions, we take the following principles:
 	- The user can write their own modelling or imputation methods that will work within our interface.
 
 
+### Single Function Approach
+
+It would be absolutely fantastic if the user could simply:
+
+```r
+m1 <- nowcast(
+	formula = y ~ x,
+	date_col = "collection_date",
+	data = my_df,
+	model = "lm",
+	impute = "linear",
+	enbpi = list(reps = 200, batch_size = 50),
+	level = 0.95
+)
+m2 <- new_model(m1, model = "ar", params = list(p = 1))
+
+m3 <- new_formula(m1, formula = y ~ lag(x, 1))
+m4 <- new_model(m3, model = "ar", params = list(p = 1))
+
+m5 <- ensemble(list(m1, m2, m3, m4), strategy = "average")
+
+# Comparison metrics only work if formula base variables are the same
+compare(m1, m2, m3, m4, m5)
+autoplot(m1, m2, m3, m4, m5) # Plot predictions, including imputations
+```
+
+# The process below will probably be deprecated
+
+This process was developed under the assumption that the user would want multiple different methods for imputation and a suite of models. Instead, I'd rather have the user see a familiar lm-like interfact and a couple helper functions for comparisons/model tweaking. I want to minimize the number of functions that users need to know about.
+
 ### 1. Load and clean the data
 
 Since we do not have access to the true data, this is left to the discretion of the user.
@@ -39,7 +69,7 @@ We expect the data to have the following properties:
 
 We will implement a check function to ensure these are correctly specified:
 
-```{r}
+```r
 check_data(data, formula = NULL, date_col = NULL)
 ```
 
@@ -53,21 +83,21 @@ The formula will tell the function which variable is the response so we can prov
 
 There are several possible imputation strategies that we will implement, so this is split as a separate function.
 
-```{r}
+```r
 imputed_data <- data |>
 	impute(formula, date_col = NULL, method = "full_linear")
 ```
 
 Alternatively the composability allows for the following:
 
-```{r}
+```r
 imputed_data <- check_data(data, formula = y ~ x, date_col = "date") |>
 	impute(method = "full_linear")
 ```
 
 There will be an `autoplot()` method for imputed data, which shows the raw data and the predictions in a `ggplot2` object..
 
-```{r}
+```r
 autoplot(imputed_data) +
 	theme_bw()
 ```
@@ -76,7 +106,7 @@ autoplot(imputed_data) +
 
 The fitting function will take in the data and output a model object.
 
-```{r}
+```r
 fitted <- fit_model(data, formula, date_col, model = "lm", cv_strategy = "basic")
 
 fitted <- check_data(data, formula, date_col) |>
@@ -88,7 +118,7 @@ Ideally, the `method` argument will also accept a user-defined function that has
 
 The autoplot method will show relevant diagnostics depending on the model.
 
-```{r}
+```r
 autoplot(fitted)
 ```
 
@@ -96,7 +126,7 @@ There will also be a way to compare multiple fitted models for training set perf
 
 ### 4. Nowcast, with prediction intervals
 
-```{r}
+```r
 nowcasted <- nowcast(data, formula, date_col, model, measure, cv_strategy)
 
 
@@ -112,7 +142,7 @@ autoplot(nowcasted)
 
 Imagine if this was the entire workflow:
 
-```{r}
+```r
 multimodel <- data |>
 	check_data(
 		formula = list(
