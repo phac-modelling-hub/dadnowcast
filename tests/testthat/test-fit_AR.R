@@ -4,9 +4,9 @@ test_that("fit simple AR model works", {
   expect_equal(test_mod[[1]]$coef[[1]], 0.2423, tolerance = 0.001)
   expect_equal(test_mod[[1]]$coef[[2]], -0.1160, tolerance = 0.001)
   expect_equal(test_mod[[1]]$coef[[3]], -0.2140, tolerance = 0.001)
-  expect_equal(test_mod[[2]][[1]][1], -0.6855, tolerance = 0.001)
-  expect_equal(test_mod[[2]][[1]][2], -0.1056, tolerance = 0.001)
-  expect_equal(test_mod[[2]][[1]][3], -0.1330, tolerance = 0.001)
+  expect_equal(test_mod$prediction[[1]], -0.6855, tolerance = 0.001)
+  expect_equal(test_mod$prediction[[2]], -0.1056, tolerance = 0.001)
+  expect_equal(test_mod$prediction[[3]], -0.1330, tolerance = 0.001)
 })
 
 test_that("fit ARX model works", {
@@ -18,9 +18,9 @@ test_that("fit ARX model works", {
   expect_equal(test_mod[[1]]$coef[[2]], -0.6169, tolerance = 0.001)
   expect_equal(test_mod[[1]]$coef[[3]], 1.6715, tolerance = 0.001)
   expect_equal(test_mod[[1]]$coef[[4]], -0.3475, tolerance = 0.001)
-  expect_equal(test_mod[[2]][[1]][1], 0.5827, tolerance = 0.001)
-  expect_equal(test_mod[[2]][[1]][2], 1.3132, tolerance = 0.001)
-  expect_equal(test_mod[[2]][[1]][3], 1.0258, tolerance = 0.001)
+  expect_equal(test_mod$prediction[[1]], 0.5827, tolerance = 0.001)
+  expect_equal(test_mod$prediction[[2]], 1.3132, tolerance = 0.001)
+  expect_equal(test_mod$prediction[[3]], 1.0258, tolerance = 0.001)
 })
 
 test_that("fit ARX model with multiple explanatory variables works", {
@@ -33,7 +33,7 @@ test_that("fit ARX model with multiple explanatory variables works", {
   expect_equal(test_mod[[1]]$coef[[3]], 1.3371, tolerance = 0.001)
   expect_equal(test_mod[[1]]$coef[[4]], -0.3578, tolerance = 0.001)
   expect_equal(test_mod[[1]]$coef[[5]], 0.2230, tolerance = 0.001)
-  expect_equal(test_mod[[2]][[1]][1], 0.6112, tolerance = 0.001)
-  expect_equal(test_mod[[2]][[1]][2], 1.6997, tolerance = 0.001)
-  expect_equal(test_mod[[2]][[1]][3], 2.1038, tolerance = 0.001)
+  expect_equal(test_mod$prediction[[1]], 0.6112, tolerance = 0.001)
+  expect_equal(test_mod$prediction[[2]], 1.6997, tolerance = 0.001)
+  expect_equal(test_mod$prediction[[3]], 2.1038, tolerance = 0.001)
 })
