@@ -4,7 +4,15 @@
 \alias{fit_AR}
 \title{Fit an AR model on given data and make predictions for a given set of data with options for using an AR or ARX model}
 \usage{
-fit_AR(Y_train, X_train = NULL, X_nowcast = NULL, p = 1, n.ahead = 1)
+fit_AR(
+  Y_train,
+  X_train = NULL,
+  X_nowcast = NULL,
+  p = 1,
+  d = 0,
+  q = 0,
+  n.ahead = 1
+)
 }
 \arguments{
 \item{p}{Integer indicating the number of parameters for the AR model}
