@@ -1,8 +1,8 @@
 #' Fit an AR model on given data and make predictions for a given set of data with options for using an AR or ARX model
 #'
-#' @param XTrain Training data for the explanatory variables in the model
-#' @param YTrain Training data for the response variable
-#' @param XNowcast Data to make predictions bases on
+#' @param X_Train Training data for the explanatory variables in the model
+#' @param Y_Train Training data for the response variable
+#' @param X_Nowcast Data to make predictions bases on
 #' @param p Integer indicating the number of parameters for the AR model
 #' @param n.ahead Integer indicating the number of predictions to be make
 #'
