@@ -18,7 +18,7 @@ fit_KalmanFilter <- function(Y_train, X_train = NULL, X_nowcast = NULL,
   }
   
   # to ensure the data is in a consistent format
-  Y_train <- data.frame(Y_train)
+  Y_train <- ts(data.frame(Y_train))
   X_train <- data.frame(X_train)
   data <- data.frame(X_train, Y_train)
   
@@ -33,10 +33,11 @@ fit_KalmanFilter <- function(Y_train, X_train = NULL, X_nowcast = NULL,
   
   # fitting the model
   # for some reason using KFAS::SSMtrend() and KFAS::SSMregression() makes this break
-  SMod <- KFAS::SSModel(YFormula ~ SSMtrend(degree = 1,  Q = list(matrix(NA))) 
-                        + SSMregression(formulaToUse, data = data), data = data)
+  SMod <- KFAS::SSModel(Y_train ~ SSMtrend(degree = 1,  Q = list(matrix(NA))) 
+                        + SSMregression(~ x1 + x2, data = data))
   
-  FitMod <- KFAS::fitSSM(SMod)$model
+  # this finds the estimates for the unknown parameters
+  FitMod <- KFAS::fitSSM(SMod, inits = c(1,1,1), method = "BFGS")$model
   
   prediction <- predict(FitMod, interval = "prediction", level = 0.9)
   
