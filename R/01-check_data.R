@@ -38,7 +38,7 @@ prep_data <- function(
 
   X_train <- model_matrix[1:train_max, , drop = FALSE]
   X_test <- model_matrix[(train_max + 1):(train_max + test_max), , drop = FALSE]
-  X_nowcast <- model_matrix[(test_max + 1):nrow(data), , drop = FALSE]
+  X_nowcast <- model_matrix[(train_max + test_max + 1):nrow(data), , drop = FALSE]
   y_train <- y[1:train_max]
   y_test <- y[(train_max + 1):(train_max + test_max)]
   # I don't know why this is here - it's all NAs anyway.
@@ -62,8 +62,8 @@ prep_data <- function(
     X_test = X_test,
     y_train = y_train,
     y_test = y_test,
-    dates_train = dates[1:num_non_na],
-    dates_nowcast = dates[(num_non_na + 1):length(dates)],
+    dates_train = dates[1:(train_max + test_max)],
+    dates_nowcast = dates[(train_max + test_max + 1):length(dates)],
     X_nowcast = X_nowcast,
     y_nowcast = y_nowcast,
     dates = dates,
