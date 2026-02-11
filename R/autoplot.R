@@ -2,13 +2,15 @@
 #'
 #' @importFrom ggplot2 autoplot
 #' @export
-autoplot.dadnow <- function(dadnow) {
+autoplot.dadnow <- function(dadnow, last_n = NULL) {
   plot_data <- data.frame(
     x = dadnow$dates_train,
-    y = dadnow$y_train,
-    method = NA
+    y = c(dadnow$y_train, dadnow$y_test),
+    method = "Training Data"
   )
-
+  if (is.null(last_n)) last_n <- length(dadnow$dates_nowcast)
+  if (last_n >= nrow(plot_data)) last_n <- nrow(plot_data) - 1
+  plot_data <- plot_data[(nrow(plot_data)- last_n):nrow(plot_data), ] 
 
   nowcast_models <- names(dadnow)[grepl("nowcast_", names(dadnow))]
   if (length(nowcast_models) > 0) {
@@ -17,8 +19,8 @@ autoplot.dadnow <- function(dadnow) {
         plot_data,
         data.frame(
           x = dadnow$dates_nowcast,
-          y = dadnow[[nowcast_models[i]]],
-          method = gsub("nowcast_", "", nowcast_models[i])
+          y = dadnow[[nowcast_models[i]]]$prediction,
+          method = gsub("(nowcast_)", "", rownames(dadnow$eval)[i])
         )
       )
     }
