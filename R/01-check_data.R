@@ -18,10 +18,6 @@ prep_data <- function(
   
   diffs <- diff(data[, date_col])
   diffs <- diffs[!is.na(diffs)]
-  require_imputation <- length(unique(diffs)) != 1
-  if (require_imputation) {
-    cat("Note: data are not sampled at regular intervals, imputation is required for some models.\n")
-  }
 
   # Training, test and nowcasting data
   response <- all.vars(formula)[1]
@@ -52,13 +48,6 @@ prep_data <- function(
   # I don't know why this is here - it's all NAs anyway.
   y_nowcast <- y[(test_max + 1):nrow(data)]
 
-  # TODO: Allow for lag terms. There are two options:
-  # 1. allow the user to specify the lags in the formula (y ~ lag(x, 1)).
-    # - Fraught with regex, but convenient for the user.
-  # 2. include an argument lags = list("x" = 2)
-    # Less convenient for the user but way easier for me.
-  # Also note that lags of the response are somewhat reasonable for some models.
-
   # Create dadnow object
   dates <- data[, date_col]
   return_value <- list(
@@ -73,8 +62,7 @@ prep_data <- function(
     dates_nowcast = dates[(train_max + test_max + 1):length(dates)],
     X_nowcast = X_nowcast,
     y_nowcast = y_nowcast,
-    dates = dates,
-    require_imputation = require_imputation
+    dates = dates
   )
   class(return_value) <- "dadnow"
   return_value
