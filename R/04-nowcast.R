@@ -1,8 +1,3 @@
-# Plan:
-# Check all trained models
-  # Some of them might contain nowcasting as part of the algorithm; in those cases I can just return the nowcasts so that the user has a consistent interface.
-  # Most will require nowcasting, in which case dispatch to the relevant functions as necssary.
-
 #' Nowcast from a dadnow object
 #'
 #' @param dadnow A dadnow object.

@@ -9,7 +9,7 @@
 #' @returns Object of class dadnow
 #' @export
 prep_data <- function(
-  formula, data, model, test_size = 0.1, date_col = NULL,
+  formula, data, model, test_size = 0.1, date_col = NULL, interpolate = TRUE,
   quiet = FALSE
 ) {
   # Ensures data has a valid date column and that it's sorted by date
@@ -64,7 +64,6 @@ prep_data <- function(
   return_value <- list(
     formula = formula,
     data = data,
-    model = model,
     date_col = date_col,
     X_train = X_train,
     X_test = X_test,
