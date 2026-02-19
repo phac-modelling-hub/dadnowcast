@@ -19,6 +19,14 @@ impute_linear <- function(dates, x) {
       next_non_na <- next_non_na + 1
     }
 
+    if (next_non_na - first_na > 10) {
+      if (first_na == 1) {
+        warning(paste0("There are ", next_non_na - first_na, " NA values at the start of the time series. Consider subsetting the data before modelling."))
+      } else {
+        warning(paste0("There are ", next_non_na - first_na, " NA values in the middle of the time series. Consider more sophisticated imputation strategies first, such as imputeTS::na_kalman()."))
+      }
+    } 
+
     if (next_non_na == length(x)) {
       x[first_na:length(x)] <- x[first_na - 1]
     } else if (first_na == 1) {
