@@ -9,7 +9,7 @@
 #' @export
 
 fit_XGBoost <- function(Y_train, X_train = NULL, X_nowcast = NULL,
-                   params = list(nrounds = NULL, evals = list(), 
+                   params = list(nrounds = 1000, evals = list(), 
                                  objective = NULL, verbose = 1,
                                  XGBparams = list())) {
   
@@ -21,10 +21,10 @@ fit_XGBoost <- function(Y_train, X_train = NULL, X_nowcast = NULL,
   Y_train <- data.frame(Y_train)
   X_train <- data.frame(X_train)
   data <- data.frame(X_train, Y_train)
-  dMatrixTrain <- xgboost::xgb.DMatrix(data, label = Y_train)
+  dMatrixTrain <- xgboost::xgb.DMatrix(as.matrix(data), label = as.matrix(Y_train))
   
   if (!"nrounds" %in% names(params)) {
-    nrounds <- 10
+    nrounds <- 1000
   } else {
     nrounds <- params$nrounds
   }
@@ -57,7 +57,7 @@ fit_XGBoost <- function(Y_train, X_train = NULL, X_nowcast = NULL,
     data = dMatrixTrain, params = xgbParams2, nrounds = nrounds, evals = evals, 
     objective = objective, verbose = verbose)
   
-  predictions <- predict(XGBModel, newdata = cbind(X_nowcast,rep(NA,length(X_nowcast[,1]))))
+  predictions <- predict(XGBModel, newdata = cbind(X_nowcast,rep(NA,length(data.frame(X_nowcast)[,1]))))
   
   list(model = XGBModel, prediction = predictions)
 }
