@@ -20,8 +20,7 @@ fit_XGBoost <- function(Y_train, X_train = NULL, X_nowcast = NULL,
   
   Y_train <- data.frame(Y_train)
   X_train <- data.frame(X_train)
-  data <- data.frame(X_train, Y_train)
-  dMatrixTrain <- xgboost::xgb.DMatrix(as.matrix(data), label = as.matrix(Y_train))
+  dMatrixTrain <- xgboost::xgb.DMatrix(X_train, label = as.matrix(Y_train))
   
   if (!"nrounds" %in% names(params)) {
     nrounds <- 1000
@@ -57,7 +56,13 @@ fit_XGBoost <- function(Y_train, X_train = NULL, X_nowcast = NULL,
     data = dMatrixTrain, params = xgbParams2, nrounds = nrounds, evals = evals, 
     objective = objective, verbose = verbose)
   
-  predictions <- predict(XGBModel, newdata = cbind(X_nowcast,rep(NA,length(data.frame(X_nowcast)[,1]))))
+  yNow <- as.matrix(rep(NA,length(data.frame(X_nowcast)[,1])))
+  
+  X_nowcast <- as.matrix(X_nowcast)
+  
+  dMatrixPred <- xgb.DMatrix(data = X_nowcast, label = yNow)
+  
+  predictions <- predict(XGBModel, newdata = dMatrixPred)
   
   list(model = XGBModel, prediction = predictions)
 }
