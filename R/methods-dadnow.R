@@ -5,12 +5,16 @@
 #' @returns A dadnow object invisibly.
 #' @export
 print.dadnow <- function(dadnow) {
-  cat("Formula:", deparse(dadnow$formula), "\n")
   cat("Date column:", dadnow$date_col, "\n")
+  cat(
+    "Date range:",
+    format(min(lubridate::ymd(dadnow$data$dates)), "%Y-%m-%d"), "to",
+    format(max(lubridate::ymd(dadnow$data$dates)), "%Y-%m-%d"), "\n"
+  )
 
   cat("\nTest set evaluation metrics:\n")
-  print(dadnow$eval)
-  if (any(dadnow$y_test == 0)) {
+  print(dadnow$evals)
+  if (any(dadnow$data$y_test == 0)) {
     cat("Note: There are zeros in the test set, which affects the mean relative error.\n")
   }
   
@@ -27,6 +31,31 @@ print.dadnow <- function(dadnow) {
   invisible(dadnow)
 }
 
+#' Print a dadnow object
+#'
+#' @param dadnow A dadnow object.
+#'
+#' @returns A dadnow object invisibly.
+#' @export
+print.multidadnow <- function(dadnow) {
+  cat("Date column:", dadnow$date_col, "\n")
+  cat(
+    "Date range:",
+    format(min(lubridate::ymd(dadnow$data[, dadnow$date_col])), "%Y-%m-%d"), "to",
+    format(max(lubridate::ymd(dadnow$data[, dadnow$date_col])), "%Y-%m-%d"), "\n"
+  )
+
+  cat("\nTest set evaluation metrics:\n")
+  all_evals <- do.call(rbind, lapply(dadnow$models, function(x) x$evals))
+  rownames(all_evals) <- NULL
+  print(all_evals[order(all_evals$rmse), ])
+  if (any(dadnow$models[[1]]$prepped_data$y_test == 0)) {
+    cat("Note: There are zeros in the test set, which affects the mean relative error.\n")
+  }
+
+  invisible(dadnow)
+}
+
 #' Summarize a dadnow object
 #' 
 #' Currently a placeholder.
@@ -36,12 +65,7 @@ print.dadnow <- function(dadnow) {
 #' @returns A dadnow object invisibly.
 #' @export
 summary.dadnow <- function(dadnow) {
-  cat("dadnow object\n")
-  cat("Formula:", deparse(dadnow$formula), "\n")
-  cat("Model:", dadnow$model, "\n")
-  cat("Date column:", dadnow$date_col, "\n")
-  cat("Order:", dadnow$order, "\n")
-  cat("Require imputation:", dadnow$require_imputation, "\n")
+  cat(names(dadnow))
 
   invisible(dadnow)
 }

@@ -65,7 +65,7 @@ prep_data <- function(
     y_nowcast = y_nowcast,
     dates = dates
   )
-  class(return_value) <- "dadnow"
+  
   return_value
 }
 

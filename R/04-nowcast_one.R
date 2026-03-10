@@ -29,8 +29,8 @@ nowcast_one <- function(
   y_now <- prepped_data$y_nowcast
 
   # Fit to training, evaluate on test
-  prepped_data$eval <- fit_model_test(
-    model, params, x_train, y_train, x_test, y_test
+  evals <- fit_model_test(
+    formula, model, params, x_train, y_train, x_test, y_test
   )
 
   # Fit to all training, create nowcast
@@ -42,12 +42,23 @@ nowcast_one <- function(
   )
   nowcast$params <- params
 
-  prepped_data[model_id] <- list(nowcast)
+  dadnow_obj <- list(
+    model_id = model_id,
+    formula = formula,
+    date_col = date_col,
+    data = as.data.frame(data),
+    prepped_data = prepped_data,
+    model = nowcast$model,
+    predictions = nowcast$prediction,
+    evals = evals,
+    params = params
+  )
+  class(dadnow_obj) <- "dadnow"
 
-  return(prepped_data)
+  dadnow_obj
 }
 
-fit_model_test <- function(model, params, x_train, y_train, x_test, y_test) {
+fit_model_test <- function(formula, model, params, x_train, y_train, x_test, y_test) {
 
   model_id <- make_model_id(model, params)
 
@@ -55,17 +66,20 @@ fit_model_test <- function(model, params, x_train, y_train, x_test, y_test) {
     X_train = x_train, Y_train = y_train, X_nowcast = x_test, params = params
   )
   eval <- data.frame(
+    "formula" = deparse(formula),
+    "model" = model,
+    "params" = paste0(names(params), params, collapse = "_"),
     "rmse" = sqrt(mean((y_test - test_preds$prediction)^2)),
     "mae" = mean(abs(y_test - test_preds$prediction)),
     "mre" = mean(((y_test - test_preds$prediction) / (y_test + 0.1))^2)
   )
-  rownames(eval) <- model_id
+
   eval
 }
 
 make_model_id <- function(model, params) {
   if (!is.character(model)) model <- as.character(substitute(model))
-  model_id <- paste0("nowcast_", model, "_",
+  model_id <- paste0(model, "_",
     paste0(names(params), params, collapse = "_")
   )
   gsub("_$", "", model_id)
