@@ -8,20 +8,19 @@ fit_KalmanFilter(
   Y_train,
   X_train = NULL,
   X_nowcast = NULL,
-  degree = 1,
-  CovMatrix = NULL
+  params = list(degree = 1)
 )
 }
 \arguments{
-\item{degree}{For trend component, integer defining the degree of the polynomial trend}
-
-\item{CovMatrix}{Covariance matrix or array of disturbance terms $\epsilon_t$ of observation equation}
-
 \item{X_Train}{Training data for the explanatory variables in the model}
 
 \item{Y_Train}{Training data for the response variable}
 
 \item{X_Nowcast}{Data to make predictions bases on3}
+
+\item{degree}{For trend component, integer defining the degree of the polynomial trend}
+
+\item{CovMatrix}{Covariance matrix or array of disturbance terms $\epsilon_t$ of observation equation}
 }
 \value{
 Kalman Filter model object and predictions

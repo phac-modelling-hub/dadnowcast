@@ -4,7 +4,7 @@
 \alias{fit_LM}
 \title{Fit a linear model on given data and make predictions for a given set of data}
 \usage{
-fit_LM(Y_train, X_train, X_nowcast)
+fit_LM(Y_train, X_train, X_nowcast, params = NULL)
 }
 \arguments{
 \item{X_Train}{Training data for the explanatory variables in the model}

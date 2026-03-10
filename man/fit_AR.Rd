@@ -8,22 +8,19 @@ fit_AR(
   Y_train,
   X_train = NULL,
   X_nowcast = NULL,
-  p = 1,
-  d = 0,
-  q = 0,
-  n.ahead = 1
+  params = list(p = 1, d = 0, q = 0, n.ahead = 1)
 )
 }
 \arguments{
-\item{p}{Integer indicating the number of parameters for the AR model}
-
-\item{n.ahead}{Integer indicating the number of predictions to be make}
-
 \item{X_Train}{Training data for the explanatory variables in the model}
 
 \item{Y_Train}{Training data for the response variable}
 
 \item{X_Nowcast}{Data to make predictions bases on}
+
+\item{p}{Integer indicating the number of parameters for the AR model}
+
+\item{n.ahead}{Integer indicating the number of predictions to be make}
 }
 \value{
 Linear model object and predictions

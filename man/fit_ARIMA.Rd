@@ -4,20 +4,25 @@
 \alias{fit_ARIMA}
 \title{Fit an ARIMA model on given data and make predictions for a given set of data with options for using an ARIMA or ARIMAX model}
 \usage{
-fit_ARIMA(Y_train, X_train = NULL, X_nowcast = NULL, p = 1, d = 0, q = 1)
+fit_ARIMA(
+  Y_train,
+  X_train = NULL,
+  X_nowcast = NULL,
+  params = list(p = 1, d = 0, q = 1)
+)
 }
 \arguments{
-\item{p}{Integer indicating the number of parameters for the AR model}
-
-\item{d}{Integer indicating the number of differences}
-
-\item{q}{integer indicating the degree of the MA model}
-
 \item{X_Train}{Training data for the explanatory variables in the model}
 
 \item{Y_Train}{Training data for the response variable}
 
 \item{X_Nowcast}{Data to make predictions bases on}
+
+\item{p}{Integer indicating the number of parameters for the AR model}
+
+\item{d}{Integer indicating the number of differences}
+
+\item{q}{integer indicating the degree of the MA model}
 }
 \value{
 ARIMA model object and predictions

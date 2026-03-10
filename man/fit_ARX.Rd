@@ -4,16 +4,16 @@
 \alias{fit_ARX}
 \title{Fit an ARX model on given data and make predictions for a given set of data}
 \usage{
-fit_ARX(Y_train, X_train = NULL, X_nowcast = NULL, p = 1)
+fit_ARX(Y_train, X_train = NULL, X_nowcast = NULL, params = list(p = 1))
 }
 \arguments{
-\item{p}{Integer indicating the number of parameters for the AR model}
-
 \item{X_Train}{Training data for the explanatory variables in the model}
 
 \item{Y_Train}{Training data for the response variable}
 
 \item{X_Nowcast}{Data to make predictions bases on}
+
+\item{p}{Integer indicating the number of parameters for the AR model}
 }
 \value{
 Linear model object and predictions

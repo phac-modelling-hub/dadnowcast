@@ -4,7 +4,15 @@
 \alias{prep_data}
 \title{Prepare the data for analysis, returning an object ready for further analysis steps.}
 \usage{
-prep_data(formula, data, model, date_col = NULL, quiet = FALSE)
+prep_data(
+  formula,
+  data,
+  model,
+  test_size = 0.1,
+  date_col = NULL,
+  interpolate = TRUE,
+  quiet = FALSE
+)
 }
 \arguments{
 \item{formula}{A formula object.}
@@ -13,9 +21,9 @@ prep_data(formula, data, model, date_col = NULL, quiet = FALSE)
 
 \item{model}{The model to use for nowcasting. Currently implemented: "lm", "ar". Can be a vector, in which case the model is trained for each model in the vector.}
 
-\item{date_col}{Name of the column containing date information. If NULL, the date information attempted to be inferred. If there's a single datetime column then it is used. If the data are a ts or mts or zoo object, the dates are esxtracted.}
+\item{test_size}{The proportion of the data to use for testing. If NULL, the data are not split. Defaults to 10\% of the data.}
 
-\item{order}{The AR order of the model to be used in \code{arima()}. Must be a vector of length 1.}
+\item{date_col}{Name of the column containing date information. If NULL, the date information attempted to be inferred. If there's a single datetime column then it is used. If the data are a ts or mts or zoo object, the dates are esxtracted.}
 }
 \value{
 Object of class dadnow
