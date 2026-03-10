@@ -20,7 +20,7 @@ autoplot.dadnow <- function(dadnow, last_n = NULL) {
         data.frame(
           x = dadnow$dates_nowcast,
           y = dadnow[[nowcast_models[i]]]$prediction,
-          method = gsub("(nowcast_)", "", rownames(dadnow$eval)[i])
+          method = gsub("(nowcast_)", "",nowcast_models[i])
         )
       )
     }
