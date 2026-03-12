@@ -47,7 +47,7 @@ fit_XGBoost <- function(Y_train, X_train = NULL, X_nowcast = NULL,
   }
   
   if (!"XGBparams" %in% names(params)) {
-    xgbParams2 = xgboost::xgb.params()
+    xgbParams2 = xgboost::xgb.params(max_depth = 3)
   } else {
     xgbParams2 <- params$XGBparams
   }
