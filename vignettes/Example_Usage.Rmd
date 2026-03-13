@@ -30,24 +30,47 @@ tail(df, 12) # last 10 are NA - to be nowcast!
 
 ```{r}
 dadnow2 <- nowcast_one(
-  dad ~ lag(npos, 5), df, model = "ar", date_col = "date", params = list(order = 1)
+  dad ~ lag(cnisp, 3) + lag(ptsos, 3), df, model = "ar", date_col = "date", params = list(order = 1)
 )
 
 dadnow2 <- add_model(dadnow2, model = "ar", params = list(order = 2)) |>
   add_model(model = "lm") |>
   add_model(model = "arx", params = list(order = 1)) |>
-  add_model(model = "gam", params = list(smooths = list("npos_lag0"=10))) |>
-  add_model(model = "rf", params = list(ntree = 500, mtry = 3))
+  add_model(model = "gam", params = list(smooths = list("cnisp_lag0"=10))) |>
+  add_model(model = "rf", formula = dad ~ lag(cnisp, 2), params = list(ntree = 500, mtry = 3))
 
 dadnow2 <- add_model(dadnow2, model = "xgboost", params = list(nrounds = 100))
 
 dadnow2
 
-autoplot(dadnow2, last_n = 150) +
+autoplot(dadnow2, last_n = 5) +
   theme_bw()
 
 ```
 
+```{r}
+mech <- nowcast_mechanistic(
+  dad ~ cnisp + ptsos + npos, df, date_col = "date",
+  params = list(sc = 0.2, sp = 0.3, method = "negbinom")
+)
+mech
+```
+
+```{r}
+dadnow3 <- combine_dadnow(dadnow2, mech) |>
+  add_mechanistic(formula = dad ~ cnisp + ptsos + npos, params = list(sc = 0.2, sp = 0.3, method = "normal")) |>
+  add_mechanistic(formula = dad ~ cnisp + ptsos + npos, params = list(sc = 0.2, sp = 0.3, method = "negbinom"))
+
+dadnow3
+autoplot(dadnow3, last_n = 5)
+```
+
+```{r}
+dadnow4 <- add_model(dadnow3, formula = dad ~ lag(npos, 5) + lag(cnisp, 5) + lag(ptsos, 5), model = "xgboost", params = list(nrounds = 100)) |>
+  add_model(formula = dad ~ lag(npos, 5) + lag(cnisp, 5) + lag(ptsos, 5), model = "lm") |>
+  add_model(formula = dad ~ lag(npos, 5) + lag(cnisp, 5) + lag(ptsos, 5), model = "ar", params = list(order = 1))
+dadnow4
+```
 
 ```{r}
 library(patchwork)
@@ -65,9 +88,13 @@ gg_dadnow / gg_ptsos / gg_cnisp
 - Prediction intervals
   - Plotted well (esp with many models)
   
-- Plots for nowcast against covariates
+- Built-in plots for nowcast against covariates
   - One covariate at a time
   - Two covariates (heatmap-like)
 
-- Multiple formulae in one `dadnow` object
-  - Affects how underlying code works, but probably a good change
+- Completed! ~~Multiple formulae in one `dadnow` object~~
+  - ~~Affects how underlying code works, but probably a good change~~
+
+- Completed! ~~Mechanistic model~~
+  - Potentially add an intercept term.
+

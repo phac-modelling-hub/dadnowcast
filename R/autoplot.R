@@ -43,11 +43,16 @@ autoplot.multidadnow <- function(multidadnow, last_n = NULL) {
   plot_data <- plot_data[(nrow(plot_data)- last_n):nrow(plot_data), ] 
 
   for (i in 1:length(multidadnow$models)) {
+    if (multidadnow$models[[i]]$model_id %in% plot_data$method) {
+      new_name <- paste0(multidadnow$models[[i]]$model_id, "_", i)
+    } else {
+      new_name <- multidadnow$models[[i]]$model_id
+    }
     plot_data <- rbind(plot_data, 
       data.frame(
         x = multidadnow$models[[i]]$prepped_data$dates_nowcast,
         y = multidadnow$models[[i]]$predictions,
-        method = multidadnow$models[[i]]$model_id
+        method = new_name
       )
     )
   }

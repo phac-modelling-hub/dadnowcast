@@ -109,7 +109,6 @@ fit_mechanistic <- function(Dt, Ct, Pt, Rt, Rt_nowcast, sc = 0.2, sp = 0.3, meth
 #' 
 #' @param formula A formula object, *must* be of the form Dt ~ Ct + Pt + Rt.
 #' @param data A data frame. Must contain the variables specified in the formula and in `date_col`. Trailing NA values in `y` will be nowcasted.
-#' @param model The model to use for nowcasting. Currently implemented: "lm", "ar". Can be a vector, in which case the model is trained for each model in the vector.
 #' @param test_size The proportion of the data to use for testing. If NULL, the data are not split. Defaults to 10% of the data.
 #' @param params The parameters to use for the model. Must be a named list containing sc and sp and method (normal, poisson, or negbinom).
 #' @param date_col Name of the column containing date information. If NULL, the date information attempted to be inferred. If there's a single datetime column then it is used. If the data are a ts or mts or zoo object, the dates are esxtracted.
@@ -117,13 +116,13 @@ fit_mechanistic <- function(Dt, Ct, Pt, Rt, Rt_nowcast, sc = 0.2, sp = 0.3, meth
 #' @returns A dadnow object with the mechanistic model added.
 #' @export
 nowcast_mechanistic <- function(
-  formula, data, model, test_size = 0.1,
+  formula, data, test_size = 0.1,
   params = list(sc = 0.2, sp = 0.3, method = "poisson"),
   date_col = NULL
 ) {
 
   prepped_data <- prep_data(
-    formula, data, model, test_size, date_col = date_col
+    formula, data, model = "mechanistic", test_size, date_col = date_col
   )
 
   test_preds <- fit_mechanistic(
@@ -138,8 +137,8 @@ nowcast_mechanistic <- function(
   )$predictions
 
   eval <- data.frame(
-    "formula" = deparse(formula),
-    "model" = "mechanistic",
+    "formula" = paste0("mech_", params$method),
+    "model" = paste0("mech_", params$method),
     "params" = paste0(names(params), params, collapse = "_"),
     "rmse" = sqrt(mean((prepped_data$y_test - test_preds)^2)),
     "mae" = mean(abs(prepped_data$y_test - test_preds)),
@@ -155,8 +154,8 @@ nowcast_mechanistic <- function(
 
   dadnow_mech <- fit_mechanistic(Dt, Ct, Pt, Rt, Rt_nowcast, params$sc, params$sp, params$method)
   dadnow <- list(
-    model_id = "mechanistic",
-    formula = "mechanistic",
+    model_id = paste0("mech_", params$method),
+    formula = paste0("mech_", params$method),
     date_col = date_col,
     prepped_data = prepped_data,
     model = dadnow_mech$model,
@@ -179,8 +178,12 @@ nowcast_mechanistic <- function(
 #'
 #' @returns A dadnow or multidadnow object with the mechanistic model added.
 #' @export
-add_mechanistic <- function(dadnow, Dt, Ct, Pt, Rt, Rt_nowcast, sc = 0.2, sp = 0.3, theta = c(1, 1.5, 0.5), method = "normal") {
-  dadnow_mech <- nowcast_mechanistic(Dt, Ct, Pt, Rt, Rt_nowcast, sc, sp, method)
+add_mechanistic <- function(dadnow, formula, params = list(sc = 0.2, sp = 0.3, method = "poisson")) {
+  dadnow_mech <- nowcast_mechanistic(
+    formula, data = dadnow$data, test_size = 0.1,
+    params = params,
+    date_col = dadnow$date_col
+  )
   
   dadnow <- combine_dadnow(dadnow, dadnow_mech)
   dadnow
