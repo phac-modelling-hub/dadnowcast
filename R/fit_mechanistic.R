@@ -4,15 +4,16 @@ nllik_normal <- function(mu, sigma, y) {
 
 optim_normal <- function(Dt, Rt, Ct, Pt, sc = 0.2, sp = 0.3) {
   nllik <- function(theta) {
-    eta <- theta[1]
-    sigma <- theta[2:4]
-    nllik_normal(eta * Rt, sigma[1], Dt) +
-      nllik_normal(eta * sc * Rt, sigma[2], Ct) +
-      nllik_normal(eta * sp * Rt, sigma[3], Pt)
+    alpha <- theta[1]
+    eta <- theta[2]
+    sigma <- theta[3:5]
+    nllik_normal(alpha + eta * Rt, sigma[1], Dt) +
+      nllik_normal(alpha + eta * sc * Rt, sigma[2], Ct) +
+      nllik_normal(alpha + eta * sp * Rt, sigma[3], Pt)
   }
   
   optim(
-    par = c("eta" = 1, "sigmaD" = 1, "sigmaC" = 1.5, "sigmaP" = 0.5),
+    par = c("alpha" = 1, "eta" = 1, "sigmaD" = 1, "sigmaC" = 1.5, "sigmaP" = 0.5),
     fn = nllik,
     method = "L-BFGS-B",
     lower = rep(1e-8, 4),
@@ -27,18 +28,19 @@ nllik_poisson <- function(theta, y) {
 
 optim_poisson <- function(Dt, Rt, Ct, Pt, sc = 0.2, sp = 0.3) {
   nllik <- function(theta) {
-    eta_Rt <- max(1e-8, theta[1] * Rt)
-    nllik_poisson(eta_Rt, Dt) +
-    nllik_poisson(eta_Rt * sc, Ct) +
-    nllik_poisson(eta_Rt * sp, Pt)
+    alpha <- theta[1]
+    eta_Rt <- max(1e-8, theta[2] * Rt)
+    nllik_poisson(alpha + eta_Rt, Dt) +
+    nllik_poisson(alpha + eta_Rt * sc, Ct) +
+    nllik_poisson(alpha + eta_Rt * sp, Pt)
   }
     
   optim(
-    par = c("eta" = 1),
+    par = c("alpha" = 1, "eta" = 1),
     fn = nllik,
     control = list(maxit = 10000),
-    method = "Brent",
-    lower = 1e-8,
+    method = "L-BFGS-B",
+    lower = rep(1e-8, 2),
     upper = 10000
   )
 }
@@ -49,21 +51,22 @@ nllik_negbinom <- function(mu, size, y) {
 
 optim_negbinom <- function(Dt, Rt, Ct, Pt, sc = 0.2, sp = 0.3) {
   nllik <- function(theta) {
-    eta_Rt <- max(1e-8, theta[1] * Rt)
-    sizeD <- theta[2]          # dispersion for Dt
-    sizeC <- theta[3]          # dispersion for Ct
-    sizeP <- theta[4]          # dispersion for Pt
+    alpha <- theta[1]
+    eta_Rt <- max(1e-8, theta[2] * Rt)
+    sizeD <- theta[3]          # dispersion for Dt
+    sizeC <- theta[4]          # dispersion for Ct
+    sizeP <- theta[5]          # dispersion for Pt
 
-    nllik_negbinom(eta_Rt, sizeD, Dt) +
-      nllik_negbinom(eta_Rt * sc, sizeC, Ct) +
-      nllik_negbinom(eta_Rt * sp, sizeP, Pt)
+    nllik_negbinom(alpha + eta_Rt, sizeD, Dt) +
+      nllik_negbinom(alpha + eta_Rt * sc, sizeC, Ct) +
+      nllik_negbinom(alpha + eta_Rt * sp, sizeP, Pt)
   }
 
   ## enforce positivity for all four parameters
   lower_bounds <- rep(1e-8, 4)
 
   optim(
-    par = c("eta" = 1, "thetaD" = 2, "thetaC" = 2.5, "thetaP" = 3),
+    par = c("alpha" = 1, "eta" = 1, "thetaD" = 2, "thetaC" = 2.5, "thetaP" = 3),
     fn = nllik,
     method = "L-BFGS-B",
     lower = lower_bounds,
@@ -102,7 +105,7 @@ fit_mechanistic <- function(Dt, Ct, Pt, Rt, Rt_nowcast, sc = 0.2, sp = 0.3, meth
 
   model <- c(optim_res$par, sc = sc, sp = sp, method = method, convergence = optim_res$convergence)
 
-  list(model = model, predictions = optim_res$par[1] * Rt_nowcast)
+  list(model = model, predictions = optim_res$par[1] + optim_res$par[2] * Rt_nowcast)
 }
 
 #' Fit a mechanistic model to the data, returning a dadnow object

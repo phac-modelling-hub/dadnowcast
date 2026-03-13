@@ -59,7 +59,7 @@ mech
 ```{r}
 dadnow3 <- combine_dadnow(dadnow2, mech) |>
   add_mechanistic(formula = dad ~ cnisp + ptsos + npos, params = list(sc = 0.2, sp = 0.3, method = "normal")) |>
-  add_mechanistic(formula = dad ~ cnisp + ptsos + npos, params = list(sc = 0.2, sp = 0.3, method = "negbinom"))
+  add_mechanistic(formula = dad ~ cnisp + ptsos + npos, params = list(sc = 0.2, sp = 0.3, method = "poisson"))
 
 dadnow3
 autoplot(dadnow3, last_n = 5)
