@@ -29,9 +29,7 @@ nowcast_one <- function(
   y_now <- prepped_data$y_nowcast
 
   # Fit to training, evaluate on test
-  evals <- fit_model_test(
-    formula, model, params, x_train, y_train, x_test, y_test
-  )
+  evals <- cross_val_error(x_train, y_train, prepped_data$cross_val_indices, model, params)
 
   # Fit to all training, create nowcast
   nowcast <- dispatch_model(model)(
@@ -56,25 +54,6 @@ nowcast_one <- function(
   class(dadnow_obj) <- "dadnow"
 
   dadnow_obj
-}
-
-fit_model_test <- function(formula, model, params, x_train, y_train, x_test, y_test) {
-
-  model_id <- make_model_id(model, params)
-
-  test_preds <- dispatch_model(model)(
-    X_train = x_train, Y_train = y_train, X_nowcast = x_test, params = params
-  )
-  eval <- data.frame(
-    "formula" = deparse(formula),
-    "model" = model,
-    "params" = paste0(names(params), params, collapse = "_"),
-    "rmse" = sqrt(mean((y_test - test_preds$prediction)^2)),
-    "mae" = mean(abs(y_test - test_preds$prediction)),
-    "mre" = mean(((y_test - test_preds$prediction) / (y_test + 0.1))^2)
-  )
-
-  eval
 }
 
 make_model_id <- function(model, params) {

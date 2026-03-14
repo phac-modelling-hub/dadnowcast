@@ -26,15 +26,12 @@ add_model.dadnow <- function(dadnow, formula = NULL, model, params = NULL) {
   }
 
   prepped_data <- prep_data(
-    formula = formula, data = dadnow$data, model = model, test_size = 0.1, date_col = dadnow$date_col
+    formula = formula, data = dadnow$data, model = model, test_size = 0.1, date_col = dadnow$date_col, cross_val_indices = dadnow$cross_val_indices
   )
 
-  new_eval <- fit_model_test(
-    formula = formula, model = model, params = params,
-    x_train = prepped_data$X_train,
-    y_train = prepped_data$y_train,
-    x_test = prepped_data$X_test,
-    y_test = prepped_data$y_test
+  new_eval <- cross_val_error(
+    X_train = prepped_data$X_train, y_train = prepped_data$y_train, folds = prepped_data$cross_val_indices,
+    model = model, params = params
   )
 
   new_preds <- dispatch_model(model)(
@@ -94,15 +91,16 @@ add_model.multidadnow <- function(multidadnow, formula = NULL, model, params = N
   }
   
   prepped_data <- prep_data(
-    formula, multidadnow$data, model, test_size = 0.1, date_col = multidadnow$date_col
+    formula, multidadnow$data, model, test_size = 0.1, date_col = multidadnow$date_col,
+    cross_val_indices = multidadnow$cross_val_indices
   )
 
-  new_eval <- fit_model_test(
-    formula = formula, model = model, params = params,
-    x_train = prepped_data$X_train,
+  new_eval <- cross_val_error(
+    X_train = prepped_data$X_train,
     y_train = prepped_data$y_train,
-    x_test = prepped_data$X_test,
-    y_test = prepped_data$y_test
+    folds = prepped_data$cross_val_indices,
+    model = model,
+    params = params
   )
 
   new_preds <- dispatch_model(model)(

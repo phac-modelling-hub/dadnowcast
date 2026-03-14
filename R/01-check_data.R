@@ -5,11 +5,14 @@
 #' @param model The model to use for nowcasting. Currently implemented: "lm", "ar". Can be a vector, in which case the model is trained for each model in the vector.
 #' @param test_size The proportion of the data to use for testing. If NULL, the data are not split. Defaults to 10% of the data.
 #' @param date_col Name of the column containing date information. If NULL, the date information attempted to be inferred. If there's a single datetime column then it is used. If the data are a ts or mts or zoo object, the dates are esxtracted.
+#' @param interpolate Whether to interpolate missing values. Defaults to TRUE.
+#' @param folds The number of folds to use for cross validation. Defaults to 5.
 #' 
 #' @returns Object of class dadnow
 #' @export
 prep_data <- function(
-  formula, data, model, test_size = 0.1, date_col = NULL, interpolate = TRUE,
+  formula, data, model, test_size = 0.1, date_col = NULL, interpolate = TRUE, folds = 5,
+  cross_val_indices = NULL,
   quiet = FALSE
 ) {
   # Ensures data has a valid date column and that it's sorted by date
@@ -49,6 +52,10 @@ prep_data <- function(
   # I don't know why this is here - it's all NAs anyway.
   y_nowcast <- y[(test_max + 1):nrow(data)]
 
+  if(is.null(cross_val_indices)) {
+    cross_val_indices <- sample(1:folds, nrow(X_train), replace = TRUE)
+  }
+
   # Create dadnow object
   dates <- data[, date_col]
   return_value <- list(
@@ -59,6 +66,7 @@ prep_data <- function(
     X_test = X_test,
     y_train = y_train,
     y_test = y_test,
+    cross_val_indices = cross_val_indices,
     dates_train = dates[1:(train_max + test_max)],
     dates_nowcast = dates[(train_max + test_max + 1):length(dates)],
     X_nowcast = X_nowcast,
