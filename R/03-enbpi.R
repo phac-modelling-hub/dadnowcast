@@ -16,7 +16,8 @@ enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, tra
 
   if (is.null(train_window)) train_window <- floor(0.6 * length(y_train))
   
-  train_indices <- sample(1:(length(y_train) - k - train_window), batches, replace = FALSE)
+
+  train_indices <- sample(1:(length(y_train) - k - train_window), batches, replace = TRUE)
 
   preds <- vector(mode = "list", length = batches)
   rmse <- vector(mode = "numeric", length = batches)
@@ -24,15 +25,16 @@ enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, tra
   mre <- vector(mode = "numeric", length = batches)
   for (i in 1:batches) {
     # Get the training data
-    X_train_k <- X_train[train_indices[i]:(train_indices[i] + train_window - 1), ]
-    y_train_k <- y_train[train_indices[i]:(train_indices[i] + train_window - 1)]
+    X_train_k <- X_train[train_indices[i]:(train_indices[i] + train_window), ]
+    y_train_k <- y_train[train_indices[i]:(train_indices[i] + train_window)]
     
     # Get the test data
-    X_test_k <- X_train[(train_indices[i] + train_window):(train_indices[i] + k + train_window), ]
-    y_test_k <- y_train[(train_indices[i] + train_window):(train_indices[i] + k + train_window)]
+    X_test_k <- X_train[(train_indices[i] + train_window + 1):(train_indices[i] + k + train_window), ]
+    y_test_k <- y_train[(train_indices[i] + train_window + 1):(train_indices[i] + k + train_window)]
 
     # Fit the model
     preds[[i]] <- dispatch_model(model)(X_train = X_train_k, Y_train = y_train_k, X_nowcast = X_test_k, params = params)$prediction
+    
     rmse[i] <- sqrt(mean((y_test_k - preds[[i]])^2))
     mae[i] <- mean(abs(y_test_k - preds[[i]]))
     mre[i] <- mean(((y_test_k - preds[[i]]) / (y_test_k + 0.1))^2)
