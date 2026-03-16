@@ -8,8 +8,7 @@ fit_XGBoost(
   Y_train,
   X_train = NULL,
   X_nowcast = NULL,
-  params = list(nrounds = 1000, evals = list(), objective = NULL, verbose = 1, XGBparams
-    = list())
+  params = list(nrounds = 100, verbose = 1, XGBparams = list())
 )
 }
 \arguments{

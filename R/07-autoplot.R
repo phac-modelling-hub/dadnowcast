@@ -1,5 +1,7 @@
 #' Plot the nowcasts
 #'
+#' Deprecated - "dadnow" objects are no longer used, but I don't want to break anything.
+#' 
 #' @importFrom ggplot2 autoplot
 #' @export
 autoplot.dadnow <- function(dadnow, last_n = NULL) {
@@ -27,6 +29,9 @@ autoplot.dadnow <- function(dadnow, last_n = NULL) {
 }
 
 #' Plot the nowcasts
+#' 
+#' @param multidadnow A multidadnow object.
+#' @param last_n The number of most recent observations to plot (in addition to the nowcasts). Defaults to all.
 #'
 #' @importFrom ggplot2 autoplot
 #' @export

@@ -8,10 +8,11 @@ prep_data(
   formula,
   data,
   model,
-  test_size = 0.1,
   date_col = NULL,
   interpolate = TRUE,
-  quiet = FALSE
+  folds = 5,
+  cross_val_indices = NULL,
+  quiet = TRUE
 )
 }
 \arguments{
@@ -21,9 +22,15 @@ prep_data(
 
 \item{model}{The model to use for nowcasting. Currently implemented: "lm", "ar". Can be a vector, in which case the model is trained for each model in the vector.}
 
-\item{test_size}{The proportion of the data to use for testing. If NULL, the data are not split. Defaults to 10\% of the data.}
-
 \item{date_col}{Name of the column containing date information. If NULL, the date information attempted to be inferred. If there's a single datetime column then it is used. If the data are a ts or mts or zoo object, the dates are esxtracted.}
+
+\item{interpolate}{Whether to interpolate missing values. Defaults to TRUE.}
+
+\item{folds}{(Deprecated) The number of folds to use for cross validation. Defaults to 5.}
+
+\item{cross_val_indices}{(Deprecated) The indices of the cross validation folds. Defaults to NULL.}
+
+\item{quiet}{Whether to print messages. Defaults to TRUE.}
 }
 \value{
 Object of class dadnow

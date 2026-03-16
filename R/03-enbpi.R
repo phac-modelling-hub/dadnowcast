@@ -1,10 +1,14 @@
 #' Ensemble batch prediction intervals and prediction metrics
 #' 
-#' @param dadnow A dadnow object.
-#' @param k The number of steps ahead to predict.
-#' @param train_window The number of days to use for training.
+#' @param X_train A data frame of training data.
+#' @param y_train A vector of training data.
+#' @param model The model to use for nowcasting.
+#' @param formula A formula object.
+#' @param params The parameters to use for the model.
+#' @param k The number of steps ahead to predict. If NULL, the number of steps is determined by the amount of data to be nowcast.
+#' @param batches The number of batches to use for training (akin to the number of folds for k-fold cross validation).
+#' @param train_window The number of days to use for training. Defaults to 60% of the training data, which allows for a large training set for each batch while also allowing for a reasonable amount of variation in the test sets.
 #' @param level The prediction interval level.
-#' @param batches The number of batches to use for training.
 #'
 #' @returns A dadnow object with the ensemble predictions and intervals added.
 #' @export

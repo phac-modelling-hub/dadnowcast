@@ -5,14 +5,16 @@
 #' @param model The model to use for nowcasting. Currently implemented: "lm", "ar". Can be a vector, in which case the model is trained for each model in the vector.
 #' @param date_col Name of the column containing date information. If NULL, the date information attempted to be inferred. If there's a single datetime column then it is used. If the data are a ts or mts or zoo object, the dates are esxtracted.
 #' @param interpolate Whether to interpolate missing values. Defaults to TRUE.
-#' @param folds The number of folds to use for cross validation. Defaults to 5.
+#' @param folds (Deprecated) The number of folds to use for cross validation. Defaults to 5.
+#' @param cross_val_indices (Deprecated) The indices of the cross validation folds. Defaults to NULL.
+#' @param quiet Whether to print messages. Defaults to TRUE.
 #' 
 #' @returns Object of class dadnow
 #' @export
 prep_data <- function(
   formula, data, model, date_col = NULL, interpolate = TRUE, folds = 5,
   cross_val_indices = NULL,
-  quiet = FALSE
+  quiet = TRUE
 ) {
   # Ensures data has a valid date column and that it's sorted by date
   data <- as.data.frame(data) |> 

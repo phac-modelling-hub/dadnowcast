@@ -27,12 +27,12 @@ df <- simulate_data() |>
 tail(df, 12) # last 10 are NA - to be nowcast!
 ```
 
-The basic usage of the package involves the "nowcast_one" function, which fits a single nowcasting model to the data. The formula interface is used to specify the response variable and covariates, and lags can be specified using the "lag" function. The function converts the data into a standard format across all models so that a single "dadnow" object can be used to store the results of multiple models, and the same plotting and evaluation functions can be used regardless of the underlying model.
+The basic usage of the package involves the "nowcast" function, which fits a single nowcasting model to the data. The formula interface is used to specify the response variable and covariates, and lags can be specified using the "lag" function. The function converts the data into a standard format across all models so that a single "dadnow" object can be used to store the results of multiple models, and the same plotting and evaluation functions can be used regardless of the underlying model.
 
 There's also an `autoplot()` method for "dadnow" objects, which plots the nowcast against the observed data. By default, it plots all training data in the "dadnow" object, but the `last_n` argument can be used to specify how many of the most recent observations to plot.
 
 ```{r}
-dadnow2 <- nowcast_one(
+dadnow2 <- nowcast(
   formula = dad ~ lag(cnisp, 3) + lag(ptsos, 3),
   data = df, 
   model = "ar", 
@@ -55,7 +55,7 @@ autoplot(dadnow2, last_n = 5) +
 
 ```
 
-The package includes a "mechanistic" model, which can be seen in `vignette("mechanistic_model")`. The model takes the parameters `sc` and `sp` and requires a method ("normal", "poisson", or "negbinom") to specify the distribution of the error term. Because it works slightly differently than the other models, it is added to a "dadnow" object using the `add_mechanistic` function, which takes the same formula interface as `nowcast_one` but with different parameters. The mechanistic model can be added alongside the other models, and the same plotting and evaluation functions can be used.
+The package includes a "mechanistic" model, which can be seen in `vignette("mechanistic_model")`. The model takes the parameters `sc` and `sp` and requires a method ("normal", "poisson", or "negbinom") to specify the distribution of the error term. Because it works slightly differently than the other models, it is added to a "dadnow" object using the `add_mechanistic` function, which takes the same formula interface as `nowcast` but with different parameters. The mechanistic model can be added alongside the other models, and the same plotting and evaluation functions can be used.
 
 Note that the mechanistic assumption is sensitive to the values of sc and sp, and there will often be warnings about lack of convergence in the optimization process.
 

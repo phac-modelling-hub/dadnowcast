@@ -2,7 +2,7 @@
 % Please edit documentation in R/02-impute.R
 \name{impute_linear}
 \alias{impute_linear}
-\title{Basic linear interpolation imputation}
+\title{Basic linear interpolation imputation.}
 \usage{
 impute_linear(dates, x)
 }
@@ -15,5 +15,5 @@ impute_linear(dates, x)
 A vector of values with NAs imputed.
 }
 \description{
-Basic linear interpolation imputation
+Interpolation is performed by linearly interpolating between the two nearest non-NA value. If the NAs are at the start or end of the time series, they are umputed as the value of the nearest non-NA value.
 }

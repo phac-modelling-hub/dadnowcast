@@ -74,15 +74,7 @@ add_model.dadnow <- function(dadnow, formula = NULL, model, params = NULL) {
   multidadnow
 }
 
-#' Add a model to an existing multidadnow object
-#'
-#' @param multidadnow A multidadnow object.
-#' @param formula A formula object.
-#' @param model The model to use for nowcasting. Currently implemented: "lm", "ar". Can be a vector, in which case the model is trained for each model in the vector.
-#' @param params The parameters to use for the model. Must be a named list.
-#'
-#' @returns A multidadnow object with the model added.
-#' @export
+#' @rdname add_model.dadnow
 add_model.multidadnow <- function(multidadnow, formula = NULL, model, params = NULL) {
   
   if (is.null(formula)) {
@@ -123,4 +115,26 @@ add_model.multidadnow <- function(multidadnow, formula = NULL, model, params = N
   names(multidadnow$models)[length(multidadnow$models)] <- make_model_id(model, params)
 
   multidadnow
+}
+
+
+#' Add a mechanistic model to a dadnow or multidadnow object
+#'
+#' @param dadnow A dadnow or multidadnow object.
+#' @param Dt,Ct,Pt,Rt The data correspoding to DAD, CNISP, PTSOS, and RVDSS, respectively.
+#' @param Rt_nowcast The RVDSS data for the nowcast period. This is used to create the nowcast predictions for the mechanistic model.
+#' @param sc,sp The scaling factors for the CNISP and PTSOS data.
+#' @param method Either "normal", "poisson", or "negbinom".
+#'
+#' @returns A dadnow or multidadnow object with the mechanistic model added.
+#' @export
+add_mechanistic <- function(dadnow, formula, params = list(sc = 0.2, sp = 0.3, method = "poisson")) {
+  dadnow_mech <- nowcast_mechanistic(
+    formula, data = dadnow$data, 
+    params = params,
+    date_col = dadnow$date_col
+  )
+  
+  dadnow <- combine_dadnow(dadnow, dadnow_mech)
+  dadnow
 }

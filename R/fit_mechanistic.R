@@ -76,10 +76,8 @@ optim_negbinom <- function(Dt, Rt, Ct, Pt, sc = 0.2, sp = 0.3) {
 
 #' Fit a mechanistic model to the data
 #' 
-#' @param Dt,Ct,Pt,Rt The data correspoding to DAD, CNISP, PTSOS, and RVDSS, respectively.
-#' @param Rt_nowcast The RVDSS data for the nowcast period. This is used to create the nowcast predictions for the mechanistic model.
-#' @param sc,sp The scaling factors for the CNISP and PTSOS data.
-#' @param method Either "normal", "poisson", or "negbinom".
+#' @param X_train,Y_train,X_nowcast The data correspoding to DAD, CNISP, PTSOS, and RVDSS, respectively.
+#' @param params The parameters to use for the model. Must be a named list containing sc and sp and method (normal, poisson, or negbinom).
 #'
 #' @returns A list with the parameter estimates and the negative log-likelihood.
 #' 
@@ -93,7 +91,7 @@ optim_negbinom <- function(Dt, Rt, Ct, Pt, sc = 0.2, sp = 0.3) {
 #'   )
 #' }
 #' d2 <- sim_poisson_data(eta = 5, Rt = rpois(100, 100))
-#' fit_mechanistic(d2$Dt, d2$Ct, d2$Pt, d2$Rt, Rt_nowcast = rpois(10, 100), method = "poisson")
+#' fit_mechanistic(Y_train = d2$Dt, X_train = d2["Ct", "Pt", "Rt"], X_nowcast = rpois(10, 100), params = list(method = "poisson"))
 #' @export
 fit_mechanistic <- function(
   Y_train, X_train = NULL, X_nowcast = NULL,
@@ -114,96 +112,4 @@ fit_mechanistic <- function(
   model <- c(optim_res$par, sc = sc, sp = sp, method = method, convergence = optim_res$convergence)
 
   list(model = model, predictions = optim_res$par[1] + optim_res$par[2] * Rt_nowcast)
-}
-
-
-#' Fit a mechanistic model to the data, returning a dadnow object
-#' 
-#' @param formula A formula object, *must* be of the form Dt ~ Ct + Pt + Rt.
-#' @param data A data frame. Must contain the variables specified in the formula and in `date_col`. Trailing NA values in `y` will be nowcasted.
-#' @param params The parameters to use for the model. Must be a named list containing sc and sp and method (normal, poisson, or negbinom).
-#' @param date_col Name of the column containing date information. If NULL, the date information attempted to be inferred. If there's a single datetime column then it is used. If the data are a ts or mts or zoo object, the dates are esxtracted.
-#'
-#' @returns A dadnow object with the mechanistic model added.
-#' @export
-nowcast_mechanistic <- function(
-  formula, data, batches = 40, train_window = NULL, level = 0.95, date_col = NULL,
-  params = list(sc = 0.2, sp = 0.3, method = "normal")
-) {
-
-  prepped_data <- prep_data(
-    formula, data, model = "mechanistic",, date_col = date_col
-  )
-
-  response <- all.vars(formula)[1]
-  terms <- all.vars(formula)[-1]
-
-  cat(
-    paste0(
-      "I see the formula \"", deparse(formula), "\"\n",
-      "Assuming that \"", response, "\" contains DAD data, \"", 
-      terms[1], "\" is CNISP, \"", terms[2], "\" is PTSOS, and \"",
-      terms[3], "\" is RVDSS.\n"
-    )
-  )
-
-  enbpi <- enbpi(
-    X_train = prepped_data$X_train,
-    y_train = prepped_data$y_train,
-    formula = paste0("mech_", params$method),
-    model = "mechanistic",
-    params = params,
-    k = nrow(prepped_data$X_nowcast),
-    batches = 40,
-    train_window = floor(0.6 * nrow(prepped_data$X_train)),
-    level = 0.95
-  )
-
-  dadnow_mech <- fit_mechanistic(
-    Y_train = prepped_data$y_train,
-    X_train = prepped_data$X_train,
-    X_nowcast = prepped_data$X_nowcast,
-    params = params
-  )
-
-  dadnow <- list(
-    date_col = date_col,
-    data = as.data.frame(data),
-    models = list(
-      list(
-        model_id = paste0("mech_", params$method),
-        formula = paste0("mech_", params$method),
-        prepped_data = prepped_data,
-        model = dadnow_mech$model,
-        predictions = dadnow_mech$predictions,
-        evals = enbpi$evals,
-        enbpi = enbpi$enbpi,
-        params = params
-      )
-    )
-  )
-  names(dadnow$models)[1] <- paste0("mech_", params$method)
-  class(dadnow) <- "multidadnow"
-  dadnow
-}
-
-#' Add a mechanistic model to a dadnow or multidadnow object
-#'
-#' @param dadnow A dadnow or multidadnow object.
-#' @param Dt,Ct,Pt,Rt The data correspoding to DAD, CNISP, PTSOS, and RVDSS, respectively.
-#' @param Rt_nowcast The RVDSS data for the nowcast period. This is used to create the nowcast predictions for the mechanistic model.
-#' @param sc,sp The scaling factors for the CNISP and PTSOS data.
-#' @param method Either "normal", "poisson", or "negbinom".
-#'
-#' @returns A dadnow or multidadnow object with the mechanistic model added.
-#' @export
-add_mechanistic <- function(dadnow, formula, params = list(sc = 0.2, sp = 0.3, method = "poisson")) {
-  dadnow_mech <- nowcast_mechanistic(
-    formula, data = dadnow$data, 
-    params = params,
-    date_col = dadnow$date_col
-  )
-  
-  dadnow <- combine_dadnow(dadnow, dadnow_mech)
-  dadnow
 }

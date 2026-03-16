@@ -1,4 +1,6 @@
-#' Basic linear interpolation imputation
+#' Basic linear interpolation imputation.
+#' 
+#' Interpolation is performed by linearly interpolating between the two nearest non-NA value. If the NAs are at the start or end of the time series, they are umputed as the value of the nearest non-NA value.
 #' 
 #' @param dates A vector of dates.
 #' @param x A vector of values.

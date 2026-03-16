@@ -2,9 +2,12 @@
 % Please edit documentation in R/06-add_model.R
 \name{add_model.dadnow}
 \alias{add_model.dadnow}
+\alias{add_model.multidadnow}
 \title{Add a model to an existing dadnow object}
 \usage{
 \method{add_model}{dadnow}(dadnow, formula = NULL, model, params = NULL)
+
+\method{add_model}{multidadnow}(multidadnow, formula = NULL, model, params = NULL)
 }
 \arguments{
 \item{dadnow}{A dadnow object.}
