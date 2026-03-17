@@ -25,8 +25,13 @@ add_model.dadnow <- function(dadnow, formula = NULL, model, params = NULL) {
     formula <- dadnow$formula
   }
 
+  if ("model" %in% names(dadnow$data)) {
+    model_data <- dadnow$data[dadnow$data$model == "Training", ]
+  } else {
+    model_data <- dadnow$data
+  }
   prepped_data <- prep_data(
-    formula = formula, data = dadnow$data, model = model, date_col = dadnow$date_col, cross_val_indices = dadnow$cross_val_indices
+    formula = formula, data = model_data, model = model, date_col = dadnow$date_col, cross_val_indices = dadnow$cross_val_indices
   )
 
   new_eval <- cross_val_error(
@@ -65,7 +70,7 @@ add_model.dadnow <- function(dadnow, formula = NULL, model, params = NULL) {
 
   multidadnow <- list(
     date_col = dadnow$date_col,
-    data = dadnow$data,
+    data = model_data,
     models = list(dadnow_one, dadnow_two)
   )
   names(multidadnow$models) <- c(dadnow_one$model_id, dadnow_two$model_id)
@@ -78,13 +83,20 @@ add_model.dadnow <- function(dadnow, formula = NULL, model, params = NULL) {
 #' @export
 add_model.multidadnow <- function(multidadnow, formula = NULL, model, params = NULL) {
   
+  
+  if ("model" %in% names(multidadnow$data)) {
+    model_data <- multidadnow$data[multidadnow$data$model == "Training", ]
+  } else {
+    model_data <- multidadnow$data
+  }
+
   if (is.null(formula)) {
     formula <- multidadnow$models[[1]]$formula
     message(paste0("Using formula from first registered model: ", deparse(formula), "\n"))
   }
   
   prepped_data <- prep_data(
-    formula, multidadnow$data, model, date_col = multidadnow$date_col,
+    formula, model_data, model, date_col = multidadnow$date_col,
     cross_val_indices = multidadnow$cross_val_indices
   )
 
@@ -106,6 +118,18 @@ add_model.multidadnow <- function(multidadnow, formula = NULL, model, params = N
     X_nowcast = prepped_data$X_nowcast,
     params = params
   )
+
+  aug_data <- as.data.frame(multidadnow$data)
+
+  nowcasted_data <- aug_data[(nrow(prepped_data$X_train) + 1):nrow(aug_data), ]
+  nowcasted_data[, prepped_data$response] <- new_preds$prediction
+  nowcasted_data$model <- model
+  nowcasted_data$params <- paste0(names(params), params, collapse = "_")
+  nowcasted_data$pi_lower <- enbpi$enbpi[, 1]
+  nowcasted_data$pi_upper <- enbpi$enbpi[, 2]
+
+  aug_data <- rbind(aug_data, nowcasted_data)
+  multidadnow$data <- aug_data
   
   multidadnow$models[[length(multidadnow$models) + 1]] <- list(
     model_id = make_model_id(model, params),
@@ -134,8 +158,16 @@ add_model.multidadnow <- function(multidadnow, formula = NULL, model, params = N
 #' @returns A dadnow or multidadnow object with the mechanistic model added.
 #' @export
 add_mechanistic <- function(dadnow, formula, params = list(sc = 0.2, sp = 0.3, method = "poisson")) {
+  
+  
+  if ("model" %in% names(dadnow$data)) {
+    model_data <- dadnow$data[dadnow$data$model == "Training", ]
+  } else {
+    model_data <- dadnow$data
+  }
+
   dadnow_mech <- nowcast_mechanistic(
-    formula, data = dadnow$data, 
+    formula, data = model_data, 
     params = params,
     date_col = dadnow$date_col
   )

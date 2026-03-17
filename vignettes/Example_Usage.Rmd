@@ -89,8 +89,8 @@ dadnow4
 
 ```{r}
 library(patchwork)
-gg_ptsos <- ggplot(df, aes(x = date, y = ptsos, group = prov)) + geom_line()
-gg_cnisp <- ggplot(df, aes(x = date, y = cnisp, group = prov)) + geom_line()
+gg_ptsos <- ggplot(df, aes(x = date, y = ptsos)) + geom_line()
+gg_cnisp <- ggplot(df, aes(x = date, y = cnisp)) + geom_line()
 
 gg_dadnow <- autoplot(dadnow2, last_n = 150) +
   theme_bw()

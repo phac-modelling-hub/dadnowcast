@@ -53,6 +53,8 @@ prep_data <- function(
   dates <- data[, date_col]
   return_value <- list(
     formula = formula,
+    response = response,
+    covariates = covariates,
     data = data,
     date_col = date_col,
     X_train = X_train,

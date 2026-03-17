@@ -37,9 +37,28 @@ nowcast <- function(
     params = params
   )
 
+  aug_data <- as.data.frame(data)
+  for (covariate in prepped_data$covariates) {
+    aug_data[[covariate]] <- impute_linear(dates = aug_data[, prepped_data$date_col], x = aug_data[[covariate]])
+  }
+  aug_data <- aug_data[order(aug_data[, prepped_data$date_col]), ]
+  
+  nowcasted_data <- aug_data[(nrow(x_train) + 1):nrow(aug_data), ]
+  nowcasted_data[, prepped_data$response] <- nowcast$prediction
+  nowcasted_data$model <- model
+  nowcasted_data$params <- paste0(names(params), params, collapse = "_")
+  nowcasted_data$pi_lower <- enbpi$enbpi[, 1]
+  nowcasted_data$pi_upper <- enbpi$enbpi[, 2]
+
+  aug_data$model <- "Training"
+  aug_data$params <- "None"
+  aug_data$pi_lower <- NA
+  aug_data$pi_upper <- NA
+  aug_data <- rbind(aug_data, nowcasted_data)
+
   dadnow_obj <- list(
     date_col = date_col,
-    data = as.data.frame(data),
+    data = aug_data,
     models = list(
       list(
         model_id = model_id,
@@ -133,9 +152,28 @@ nowcast_mechanistic <- function(
     params = params
   )
 
+  aug_data <- as.data.frame(data)
+  for (covariate in prepped_data$covariates) {
+    aug_data[[covariate]] <- impute_linear(dates = aug_data[, prepped_data$date_col], x = aug_data[[covariate]])
+  }
+  aug_data <- aug_data[order(aug_data[, prepped_data$date_col]), ]
+  
+  nowcasted_data <- aug_data[(nrow(prepped_data$X_train) + 1):nrow(aug_data), ]
+  nowcasted_data[, prepped_data$response] <- dadnow_mech$prediction
+  nowcasted_data$model <- paste0("mech_", params$method)
+  nowcasted_data$params <- paste0(names(params), params, collapse = "_")
+  nowcasted_data$pi_lower <- enbpi$enbpi[, 1]
+  nowcasted_data$pi_upper <- enbpi$enbpi[, 2]
+
+  aug_data$model <- "Training"
+  aug_data$params <- "None"
+  aug_data$pi_lower <- NA
+  aug_data$pi_upper <- NA
+  aug_data <- rbind(aug_data, nowcasted_data)
+
   dadnow <- list(
     date_col = date_col,
-    data = as.data.frame(data),
+    data = aug_data,
     models = list(
       list(
         model_id = paste0("mech_", params$method),

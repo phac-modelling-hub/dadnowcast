@@ -6,10 +6,13 @@
 #' @returns A single multidadnow object.
 #' @export
 combine_dadnow <- function(dadnow1, dadnow2) {
+  data <- rbind(dadnow1$data, dadnow2$data)
+  data <- data[!duplicated(data), ]
+
   if (inherits(dadnow1, "dadnow") && inherits(dadnow2, "dadnow")) {
     return_value <- list(
       date_col = dadnow1$date_col,
-      data = dadnow1$data,
+      data = data,
       models = list(dadnow1, dadnow2)
     )
     names(return_value$models) <- c(dadnow1$model_id, dadnow2$model_id)
@@ -20,7 +23,7 @@ combine_dadnow <- function(dadnow1, dadnow2) {
     names(models)[length(models)] <- dadnow2$model_id
     return_value <- list(
       date_col = dadnow1$date_col,
-      data = dadnow1$data,
+      data = data,
       models = models
     )
     class(return_value) <- "multidadnow"
@@ -30,7 +33,7 @@ combine_dadnow <- function(dadnow1, dadnow2) {
     names(models)[1] <- dadnow1$model_id
     return_value <- list(
       date_col = dadnow2$date_col,
-      data = dadnow2$data,
+      data = data,
       models = models
     )
     class(return_value) <- "multidadnow"
@@ -40,7 +43,7 @@ combine_dadnow <- function(dadnow1, dadnow2) {
     names(models) <- c(names(dadnow1$models), names(dadnow2$models))
     return_value <- list(
       date_col = dadnow1$date_col,
-      data = dadnow1$data,
+      data = data,
       models = models
     )
     class(return_value) <- "multidadnow"
