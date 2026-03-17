@@ -6,7 +6,6 @@
 #' @param x A vector of values.
 #' 
 #' @returns A vector of values with NAs imputed.
-#' @export
 impute_linear <- function(dates, x) {
   na_vals <- dates[is.na(x)]
   if (length(na_vals) == 0) return(x)

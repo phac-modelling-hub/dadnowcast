@@ -10,7 +10,6 @@
 #' @param quiet Whether to print messages. Defaults to TRUE.
 #' 
 #' @returns Object of class dadnow
-#' @export
 prep_data <- function(
   formula, data, model, date_col = NULL, interpolate = TRUE, folds = 5,
   cross_val_indices = NULL,

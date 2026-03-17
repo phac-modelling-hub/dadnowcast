@@ -11,7 +11,6 @@
 #' @param level The prediction interval level.
 #'
 #' @returns A dadnow object with the ensemble predictions and intervals added.
-#' @export
 enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, train_window = NULL, level = 0.95) {
 
   if (is.null(train_window)) train_window <- floor(0.6 * length(y_train))
