@@ -54,12 +54,18 @@ fit_KalmanFilter <- function(Y_train, X_train = NULL, X_nowcast = NULL,
   
   newData <- cbind(X_nowcast, newY)
   
-  # create a new SMod object for the new data
+  # create a new SMod object for the new data for predictions
   newMod <- KFAS::SSModel(newY ~ SSMregression(formulaToUse, Q = fitMod$Q, 
                                                data = newData), 
                           H = fitMod$H)
   
-  prediction <- as.numeric(predict(fitMod, newdata = newMod))
+  oldMod <- KFAS::SSModel(Y_train ~ SSMregression(formulaToUse, Q = fitMod$Q, 
+                                                  data = data), 
+                          H = fitMod$H)
   
-  list(model = fitMod, prediction = prediction)
+  prediction <- data.frame(predict(fitMod, newdata = newMod))
+  
+  fits <- predict(fitMod, newdata = oldMod)
+  
+  list(model = fitMod, prediction = prediction, fitted_values = fits)
 }

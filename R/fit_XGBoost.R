@@ -65,9 +65,14 @@ fit_XGBoost <- function(Y_train, X_train = NULL, X_nowcast = NULL,
   
   X_nowcast <- as.matrix(X_nowcast)
   
+  # create the predictions for the XGBoost model
   dMatrixPred <- xgboost::xgb.DMatrix(data = X_nowcast, label = yNow)
   
-  predictions <- predict(XGBModel, newdata = dMatrixPred)
+  predictions <- data.frame(predict(XGBModel, newdata = dMatrixPred))
+  colnames(predictions)[1] <- "prediction"
   
-  list(model = XGBModel, prediction = predictions)
+  # create the fitted values by running predict of the training data
+  fits <- predict(XGBModel, newdata = dMatrixTrain)
+  
+  list(model = XGBModel, prediction = predictions, fitted_values = fits)
 }

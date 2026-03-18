@@ -42,8 +42,13 @@ fit_AR <- function(Y_train, X_train = NULL, X_nowcast = NULL, params = list(p = 
   #  function doesn't effect it at all, allowing us to use the same function for
   #  AR and ARX models!
   AR_mod <- arima(Y_train, order = c(p, d, q), xreg = X_train)
+  
+  preds <- predict(AR_mod, n, X_nowcast)
 
-  predictions <- as.numeric(predict(AR_mod, n, X_nowcast)$pred)
+  predictions <- data.frame(preds$pred, preds$se)
+  
+  fitVals <- Y_train - AR_mod$residuals
 
-  list(model = AR_mod, prediction = predictions)
+  list(model = AR_mod, prediction = predictions, fitted_values = fitVals)
 }
+

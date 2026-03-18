@@ -85,7 +85,10 @@ fit_RF <- function(Y_train, X_train = NULL, X_nowcast = NULL,
     na.action = na.omit
   )
 
-  predictions <- predict(RFModel, newdata = X_nowcast)
-
-  list(model = RFModel, prediction = predictions)
+  predictions <- data.frame(predict(RFModel, newdata = X_nowcast))
+  colnames(predictions)[1] <- "prediction"
+  
+  fits <- predict(RFModel, newdata = X_train)
+  
+  list(model = RFModel, prediction = predictions, fitted_values = fits)
 }

@@ -69,7 +69,8 @@ fit_GAM <- function(
 
   colnames(XNowcast) <- colnames(full_data)[-1]
 
-  predicted_GAM <- predict(fitted_GAM, newdata = XNowcast)
+  predicted_GAM <- data.frame(predict(fitted_GAM, newdata = XNowcast))
+  colnames(predicted_GAM)[1] <- "prediction"
 
-  list(model = fitted_GAM, prediction = predicted_GAM)
+  list(model = fitted_GAM, prediction = predicted_GAM, fitted_values = fitted_GAM$fitted.values)
 }

@@ -111,5 +111,10 @@ fit_mechanistic <- function(
 
   model <- c(optim_res$par, sc = params$sc, sp = params$sp, method = params$method, convergence = optim_res$convergence)
 
-  list(model = model, predictions = optim_res$par[1] + optim_res$par[2] * Rt_nowcast)
+  preds <- data.frame(optim_res$par[1] + optim_res$par[2] * Rt_nowcast)
+  colnames(preds)[1] <- "prediction"
+  
+  fits <- as.numeric(optim_res$par[1] + optim_res$par[2] * X_train[,3])
+  
+  list(model = model, predictions = preds, fitted_values = fits)
 }
