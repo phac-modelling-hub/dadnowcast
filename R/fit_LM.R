@@ -15,7 +15,9 @@ fit_LM <- function(Y_train, X_train, X_nowcast, params = NULL) {
 
   colnames(XNowcast) <- colnames(full_data)[-1]
 
-  predicted_LM <- predict(fitted_LM, newdata = XNowcast, se.fit = TRUE)
+  predicted_LM <- predict(
+    fitted_LM, newdata = XNowcast, se.fit = TRUE, interval = "prediction"
+  )
   preds <- data.frame(
     prediction = predicted_LM$fit,
     lower = predicted_LM$fit - 1.96 * predicted_LM$se.fit,
