@@ -15,7 +15,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-devtools::load_all()
+#devtools::load_all()
+library(fatherStay)
 library(ggplot2)
 ```
 
@@ -27,7 +28,11 @@ tail(df, 12) # last 10 are NA - to be nowcast!
 pairs(df[, -1])
 ```
 
-The basic usage of the package involves the "nowcast" function, which fits a single nowcasting model to the data. The formula interface is used to specify the response variable and covariates, and lags can be specified using the "lag" function within the formula. The function converts the data into a standard format across all models so that a single "multidadnow" object can be used to store the results of multiple models, and the same plotting and evaluation functions can be used regardless of the underlying model.
+The basic usage of the package involves the "nowcast" function, which fits a single nowcasting model to the data. 
+
+The formula interface is used to specify the response variable and covariates, and lags can be specified using the "lag" function within the formula. The function converts the data into a standard format across all models so that a single "multidadnow" object can be used to store the results of multiple models, and the same plotting and evaluation functions can be used regardless of the underlying model.
+
+The `add_nowcast()` interface allows for new formulas to be specified when adding new models. Notice that a message will be displayed if no formula is specified, in whiuch case the formula from the first registered model will be used.
 
 There's also an `autoplot()` method for "multidadnow" objects, which plots the nowcast against the observed data. By default, it plots all training data in the "multidadnow" object, but the `last_n` argument can be used to specify how many of the most recent observations to plot.
 
@@ -40,18 +45,19 @@ dadnow2 <- nowcast(
   params = list(order = 1)
 )
 
-dadnow2 <- add_model(dadnow2, model = "ar", params = list(order = 2)) |>
-  add_model(model = "lm") |>
-  add_model(model = "arx", params = list(order = 1)) |>
-  add_model(model = "gam", params = list(smooths = list("cnisp_lag0"=10))) |>
-  add_model(model = "rf", formula = dad ~ lag(cnisp, 2), params = list(ntree = 500, mtry = 3))
+dadnow2 <- add_nowcast(dadnow2, model = "ar", params = list(order = 2)) |>
+  add_nowcast("lm") |>
+  add_nowcast("lm", formula = dad ~ cnisp + ptsos + npos) |>
+  add_nowcast("arx", params = list(order = 1)) |>
+  add_nowcast("gam", params = list(smooths = list("cnisp_lag0"=10))) |>
+  add_nowcast("rf", formula = dad ~ lag(cnisp, 2), params = list(ntree = 500, mtry = 3))
 
-dadnow2 <- add_model(dadnow2, model = "xgboost", params = list(nrounds = 20))
+dadnow2 <- add_nowcast(dadnow2, model = "xgboost", params = list(nrounds = 20))
 
 dadnow2
 
-autoplot(dadnow2, last_n = 50) +
-  theme_bw()
+#autoplot(dadnow2, last_n = 50) +
+#  theme_bw()
 
 ```
 
@@ -60,42 +66,37 @@ The package includes a "mechanistic" model, which can be seen in `vignette("mech
 Note that the mechanistic assumption is sensitive to the values of sc and sp, and there will often be warnings about lack of convergence in the optimization process.
 
 ```{r}
-mech <- nowcast_mechanistic(
+mech <- nowcast(
+  model = "mechanistic",
   dad ~ cnisp + ptsos + npos, df, date_col = "date",
   params = list(sc = 0.2, sp = 0.3, method = "poisson")
 )
 mech
 ```
 
-In addition to `add_model()` and `add_mechanistic()`, which adds a single model to a "multidadnow" object, there is also a `combine_dadnow` function, which combines two "multidadnow" objects.
+In addition to `add_nowcast()` and `add_mechanistic()`, which adds a single model to a "multidadnow" object, there is also a `combine_nowcasts` function, which combines two "multidadnow" objects.
 
 ```{r}
-dadnow3 <- combine_dadnow(dadnow2, mech) |>
-  add_mechanistic(formula = dad ~ cnisp + ptsos + npos, params = list(sc = 0.2, sp = 0.3, method = "normal")) |>
-  add_mechanistic(formula = dad ~ cnisp + ptsos + npos, params = list(sc = 0.2, sp = 0.3, method = "poisson"))
+dadnow3 <- combine_nowcasts(dadnow2, mech) |>
+  add_nowcast(formula = dad ~ cnisp + ptsos + npos, model = "mechanistic", params = list(sc = 0.2, sp = 0.3, method = "normal")) |>
+  add_nowcast(formula = dad ~ cnisp + ptsos + npos, model = "mechanistic", params = list(sc = 0.2, sp = 0.3, method = "poisson"))
 
 dadnow3
-autoplot(dadnow3, last_n = 5)
+#autoplot(dadnow3, last_n = 5)
 ```
 
-The `add_model()` interface allows for new formulas to be specified when adding new models. 
+The `add_nowcast()` interface allows for new formulas to be specified when adding new models. 
 
-```{r}
-dadnow4 <- add_model(dadnow3, formula = dad ~ lag(npos, 5) + lag(cnisp, 5) + lag(ptsos, 5), model = "xgboost", params = list(nrounds = 50)) |>
-  add_model(formula = dad ~ lag(npos, 5) + lag(cnisp, 5) + lag(ptsos, 5), model = "lm") |>
-  add_model(formula = dad ~ lag(npos, 5) + lag(cnisp, 5) + lag(ptsos, 5), model = "ar", params = list(order = 1))
-dadnow4
-```
 
 ```{r}
 library(patchwork)
 gg_ptsos <- ggplot(df, aes(x = date, y = ptsos)) + geom_line()
 gg_cnisp <- ggplot(df, aes(x = date, y = cnisp)) + geom_line()
 
-gg_dadnow <- autoplot(dadnow2, last_n = 150) +
-  theme_bw()
+#gg_dadnow <- autoplot(dadnow2, last_n = 150) +
+#  theme_bw()
 
-gg_dadnow / gg_ptsos / gg_cnisp
+#gg_dadnow / gg_ptsos / gg_cnisp
 ```
 
 # Work in Progress
