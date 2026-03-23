@@ -11,7 +11,7 @@ optim_normal <- function(Dt, Rt, Ct, Pt, sc = 0.2, sp = 0.3) {
       nllik_normal(alpha + eta * sc * Rt, sigma[2], Ct) +
       nllik_normal(alpha + eta * sp * Rt, sigma[3], Pt)
   }
-  
+
   optim(
     par = c("alpha" = 1, "eta" = 1, "sigmaD" = 1, "sigmaC" = 1.5, "sigmaP" = 0.5),
     fn = nllik,
@@ -34,7 +34,7 @@ optim_poisson <- function(Dt, Rt, Ct, Pt, sc = 0.2, sp = 0.3) {
     nllik_poisson(alpha + eta_Rt * sc, Ct) +
     nllik_poisson(alpha + eta_Rt * sp, Pt)
   }
-    
+
   optim(
     par = c("alpha" = 1, "eta" = 1),
     fn = nllik,
@@ -75,12 +75,12 @@ optim_negbinom <- function(Dt, Rt, Ct, Pt, sc = 0.2, sp = 0.3) {
 
 
 #' Fit a mechanistic model to the data
-#' 
+#'
 #' @param X_train,Y_train,X_nowcast The data correspoding to DAD, CNISP, PTSOS, and RVDSS, respectively.
 #' @param params The parameters to use for the model. Must be a named list containing sc and sp and method (normal, poisson, or negbinom).
 #'
 #' @returns A list with the parameter estimates and the negative log-likelihood.
-#' 
+#'
 #' @examples
 #' sim_poisson_data <- function(eta, Rt, sc = 0.2, sp = 0.3) {
 #'   data.frame(
@@ -105,7 +105,7 @@ fit_mechanistic <- function(
   if (!"method" %in% names(params)) {
     params$method <- "normal"
   }
-  
+
   Dt <- Y_train
   Ct <- X_train[, 1]
   Pt <- X_train[, 2]
@@ -121,8 +121,8 @@ fit_mechanistic <- function(
   model <- c(optim_res$par, sc = params$sc, sp = params$sp, method = params$method, convergence = optim_res$convergence)
 
   preds <- data.frame(prediction = optim_res$par[1] + optim_res$par[2] * Rt_nowcast)
-  
+
   fits <- as.numeric(optim_res$par[1] + optim_res$par[2] * X_train[,3])
-  
+
   list(model = model, prediction = preds, fitted_values = fits)
 }

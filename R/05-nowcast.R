@@ -8,7 +8,7 @@
 #' @param level The prediction interval level.
 #' @param params The parameters to use for the model. Must be a named list.
 #' @param date_col Name of the column containing date information. If NULL, the date information attempted to be inferred. If there's a single datetime column then it is used. If the data are a ts or mts or zoo object, the dates are esxtracted.
-#' 
+#'
 #' @details
 #' A short overview of the specific models used here is given below, more details can be found in the vignette `Model_Details`.
 #' - "lm", a standard linear model, which takes no additional parameters.
@@ -21,7 +21,7 @@
 #' - "xgboost", a extreme gradient boosting model, which is a tree based model in which subsequent trees learn from previous trees, it takes parameters `nrounds` which is the number of boosting iteration to do, and `XGBparams` a list of more parameters used in the model the most important of which is `max_depth` both `nrounds` and `max_depth` are tuned if their values are not specified, it also takes `verbose` should output be silent (0) or not (1).
 #' - "mechanistic", creates a mechanistic model, `sc`, `sp`, and `method` specifies the family.
 #' - See `vignette("Write_fit_XX_functions", package = "fatherStay")` for how to write your own model for use in this package.
-#' 
+#'
 #'
 #' @returns An object of class "`dadnow`".
 #'
@@ -32,10 +32,10 @@ nowcast <- function(
   ) {
 
   cat("Model:", model, "\n")
-  
+
   # Retuns a list with all of the neceassry data.
   # This ends up duplicating the data within each model, but it makes it
-  # easier to deal with models that have different formulas (and thus have different 
+  # easier to deal with models that have different formulas (and thus have different
   # training data sets).
   prepped_data <- prep_data(
     formula, data, model, date_col = date_col
@@ -48,7 +48,7 @@ nowcast <- function(
     cat(
       paste0(
         "I see the formula \"", deparse(formula), "\"\n",
-        "Assuming that \"", response, "\" contains DAD data, \"", 
+        "Assuming that \"", response, "\" contains DAD data, \"",
         terms[1], "\" is CNISP, \"", terms[2], "\" is PTSOS, and \"",
         terms[3], "\" is RVDSS.\n"
       )
@@ -59,7 +59,7 @@ nowcast <- function(
   y_train <- prepped_data$y_train
   X_now <- prepped_data$X_nowcast
   y_now <- prepped_data$y_nowcast
-  
+
   # Returns a list with the k-step ahead prediction standard errors and the evaluations of the models for the k-step ahead predictions.
   # The evaluations include all metrics used for comparison.
   enbpi <- enbpi(
@@ -90,7 +90,7 @@ nowcast <- function(
     aug_data[[covariate]] <- impute_linear(dates = aug_data[, prepped_data$date_col], x = aug_data[[covariate]])
   }
   aug_data <- aug_data[order(aug_data[, prepped_data$date_col]), ]
-  
+
   nowcasted_data <- aug_data[(nrow(X_train) + 1):nrow(aug_data), ]
   nowcasted_data[, prepped_data$response] <- nowcast$prediction$prediction
   nowcasted_data$model <- ifelse(
@@ -156,11 +156,11 @@ make_model_id <- function(evals) {
 
   param_set <- ave(
     seq_len(nrow(evals)),
-    all_models, 
+    all_models,
     all_formulas,
     FUN = seq_along
   )
-  
+
   # If a model/formula is repeated, add "a", "b", etc. to the end of the model id.
   suffix <- ifelse(param_set > 1, letters[param_set], "")
   model_ids <- paste0(model_ids, suffix)

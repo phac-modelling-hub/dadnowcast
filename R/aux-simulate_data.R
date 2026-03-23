@@ -68,8 +68,8 @@ simulate_data <- function(
     dplyr::group_by(prov) |>
     dplyr::mutate(
       dad = dplyr::if_else(
-        condition = date > lubridate::ymd("2021-12-21"), 
-        true = NA, 
+        condition = date > lubridate::ymd("2021-12-21"),
+        true = NA,
         false = dad
       )
     )
@@ -108,12 +108,12 @@ simulate_ar <- function(
 }
 
 #' Simulate from the mechanistic model
-#' 
+#'
 #' @param ar1,ar2,sigma The AR parameters for the RVDSS.
 #' @param eta The scaling factor for the CNISP and PTSOS and DAD.
 #' @param sc,sp The scaling factors for the CNISP and PTSOS data.
 #' @param to_nowcast The number of days to nowcast.
-#' 
+#'
 #' @returns A dataframe with simulated data for DAD, CNISP, PTSOS, and RVDSS.
 #' @export
 simulate_mechanistic <- function(
@@ -121,7 +121,7 @@ simulate_mechanistic <- function(
   ar1 = 0.65, ar2 = 0.3, sigma = 0.1,
   eta = 0.2, sc = 0.2, sp = 0.3
 ) {
-  
+
 
   dates <- seq(
     lubridate::ymd("2020-01-01"),

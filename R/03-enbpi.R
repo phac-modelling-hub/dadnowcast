@@ -1,7 +1,7 @@
 #' Ensemble batch prediction intervals and prediction metrics
-#' 
+#'
 #' EnbPI takes `batches` of training data, fits a model to each batch, and then uses the residuals to calculate prediction intervals and prediction metrics. This targets the exact standard errors that we're looking for. If we're doing 8-step ahead nowcasting, we need an estimate of the standard error for the eighth step ahead, not just the general standard error for predictions. This is a model-agnostic approach to calculating prediction intervals.
-#' 
+#'
 #' @param X_train A data frame of training data.
 #' @param y_train A vector of training data.
 #' @param model The model to use for nowcasting.
@@ -17,7 +17,7 @@ enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, tra
 
   # If the train_window is not specified, set it to 60% of the training data
   if (is.null(train_window)) train_window <- floor(0.6 * length(y_train))
-  
+
   # Indices must be sampled such that the test data is still within the training data
   train_indices <- sample(1:(length(y_train) - k - train_window), batches, replace = TRUE)
 
@@ -30,7 +30,7 @@ enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, tra
     # Get the training data
     X_train_k <- X_train[train_indices[i]:(train_indices[i] + train_window), ]
     y_train_k <- y_train[train_indices[i]:(train_indices[i] + train_window)]
-    
+
     # Get the test data
     X_test_k <- X_train[(train_indices[i] + train_window + 1):(train_indices[i] + k + train_window), ]
     y_test_k <- y_train[(train_indices[i] + train_window + 1):(train_indices[i] + k + train_window)]
@@ -38,7 +38,7 @@ enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, tra
     # Fit the model and get residuals
     preds[[i]] <- dispatch_model(model)(X_train = X_train_k, Y_train = y_train_k, X_nowcast = X_test_k, params = params)$prediction$prediction
     resids[[i]] <- y_test_k - preds[[i]]
-    
+
     rmse[i] <- sqrt(mean((y_test_k - preds[[i]])^2))
     mae[i] <- mean(abs(y_test_k - preds[[i]]))
     mre[i] <- mean(((y_test_k - preds[[i]]) / (y_test_k + 0.1))^2)

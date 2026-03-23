@@ -1,5 +1,5 @@
 #' Prepare the data for analysis, returning an object ready for further analysis steps.
-#' 
+#'
 #' @param formula A formula object.
 #' @param data A data frame.
 #' @param model The model to use for nowcasting. Currently implemented: "lm", "ar". Can be a vector, in which case the model is trained for each model in the vector.
@@ -8,7 +8,7 @@
 #' @param folds (Deprecated) The number of folds to use for cross validation. Defaults to 5.
 #' @param cross_val_indices (Deprecated) The indices of the cross validation folds. Defaults to NULL.
 #' @param quiet Whether to print messages. Defaults to TRUE.
-#' 
+#'
 #' @returns Object of class dadnow
 prep_data <- function(
   formula, data, model, date_col = NULL, interpolate = TRUE, folds = 5,
@@ -16,7 +16,7 @@ prep_data <- function(
   quiet = TRUE
 ) {
   # Ensures data has a valid date column and that it's sorted by date
-  data <- as.data.frame(data) |> 
+  data <- as.data.frame(data) |>
     parse_dates(date_col = date_col, quiet = quiet) |>
     dplyr::arrange(date)
 
@@ -68,7 +68,7 @@ prep_data <- function(
     y_nowcast = y_nowcast,
     dates = dates
   )
-  
+
   return_value
 }
 
@@ -113,22 +113,22 @@ parse_lag_formula <- function(formula, data) {
   tms <- terms(formula, data = data)
   # Get the labels (e.g., "lag(x, 2)", "lag(z, 3)")
   term_labels <- attr(tms, "term.labels")
-  
+
   # Initialize a list to store our expanded columns
   model_cols <- list()
-  
+
   for (label in term_labels) {
     # Convert the string label back into a language object (call)
     call_obj <- parse(text = label)[[1]]
-    
+
     # Check if the term is a 'lag' function
     if (is.call(call_obj) && call_obj[[1]] == quote(lag)) {
       var_name <- as.character(call_obj[[2]])
       max_lag  <- as.numeric(call_obj[[3]])
-      
+
       # Extract the original vector from the data
       original_vec <- data[[var_name]]
-      
+
       # Create lags 0 through max_lag
       for (i in 0:max_lag) {
         col_name <- paste0(var_name, "_lag", i)
@@ -140,27 +140,27 @@ parse_lag_formula <- function(formula, data) {
       model_cols[[label]] <- data[[label]]
     }
   }
-  
+
   # Return as a data frame/matrix
   as.data.frame(model_cols)
 }
 
 #' Prepare data for a particular formula, for use in predict(dadnow$models$model, newdata = X_train)
-#' 
+#'
 #' This function prepares data in the same way as is done for the `nowcast()` function, but for use in `predict(dadnow$models$model, newdata = X_train)`. In particular, it ensures that the data is sorted by date, and that missing values are imputed, then parses the formula to create a model matrix (including lag terms).
-#' 
+#'
 #' @param formula A formula object.
 #' @param data A data frame.
 #' @param date_col Name of the column containing date information. If NULL, the date information attempted to be inferred. If there's a single datetime column then it is used. If the data are a ts or mts or zoo object, the dates are esxtracted.
 #' @param interpolate Whether to interpolate missing values. Defaults to TRUE.
-#' 
+#'
 #' @returns Data suitable for use in predict(dadnow$models$model, newdata = newdata)
 #' @export
 prep_newdata <- function(
   formula, data, date_col = NULL, interpolate = TRUE
 ) {
   # Ensures data has a valid date column and that it's sorted by date
-  data <- as.data.frame(data) |> 
+  data <- as.data.frame(data) |>
     parse_dates(date_col = date_col, quiet = TRUE) |>
     dplyr::arrange(date)
 

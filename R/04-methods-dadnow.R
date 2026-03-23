@@ -22,7 +22,7 @@ print.multidadnow <- function(dadnow) {
 }
 
 #' Summarize a dadnow object
-#' 
+#'
 #' Currently a placeholder.
 #'
 #' @param dadnow A dadnow object.

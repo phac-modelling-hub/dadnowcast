@@ -18,19 +18,19 @@ fit_AR <- function(Y_train, X_train = NULL, X_nowcast = NULL, params = list(p = 
       n <- nrow(data.frame(X_nowcast))
     }
   }
-  
+
   if (!"p" %in% names(params)) {
     p <- 0
   } else {
     p <- params$p
   }
-  
+
   if (!"d" %in% names(params)) {
     d <- 0
   } else {
     d <- params$d
   }
-  
+
   if (!"q" %in% names(params)) {
     q <- 0
   } else {
@@ -41,11 +41,11 @@ fit_AR <- function(Y_train, X_train = NULL, X_nowcast = NULL, params = list(p = 
   #  function doesn't effect it at all, allowing us to use the same function for
   #  AR and ARX models!
   AR_mod <- arima(Y_train, order = c(p, d, q), xreg = X_train)
-  
+
   preds <- predict(AR_mod, n, X_nowcast)
 
   predictions <- data.frame(prediction = preds$pred, lower = preds$pred - 1.96 * preds$se, upper = preds$pred + 1.96 * preds$se)
-  
+
   fitVals <- Y_train - AR_mod$residuals
 
   list(model = AR_mod, prediction = predictions, fitted_values = fitVals)

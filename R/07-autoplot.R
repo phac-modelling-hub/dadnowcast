@@ -1,6 +1,6 @@
 
 #' Plot the nowcasts
-#' 
+#'
 #' @param multidadnow A multidadnow object.
 #' @param last_n The number of most recent observations to plot (in addition to the nowcasts). Defaults to all.
 #'
@@ -8,7 +8,7 @@
 #' @export
 autoplot.multidadnow <- function(multidadnow, se = FALSE, last_n = Inf, alpha = 0.2) {
   plot_data <- multidadnow$data[!is.na(multidadnow$data[, multidadnow$response]), ]
-  
+
   # Get the training data, and only plot the last n observations.
   training_data <- plot_data[plot_data$model == "Training", ]
   if (last_n < nrow(training_data)) {
@@ -21,7 +21,7 @@ autoplot.multidadnow <- function(multidadnow, se = FALSE, last_n = Inf, alpha = 
 
   # Bare object. I want the nowcasts to be the top layer, so they come later.
   g <- ggplot2::ggplot()
-    
+
   if (se) {
     g <- g +
       ggplot2::geom_ribbon(
@@ -48,12 +48,12 @@ autoplot.multidadnow <- function(multidadnow, se = FALSE, last_n = Inf, alpha = 
           x = !!sym(multidadnow$date_col),
           y = !!sym(multidadnow$response)
         ),
-        colour = "grey", 
+        colour = "grey",
         size   = 1,
         inherit.aes = FALSE
       )
   }
-  
+
   g <- g + ggplot2::geom_line(
       data = plot_data,
       mapping = ggplot2::aes(

@@ -1,15 +1,15 @@
 #' Basic linear interpolation imputation.
-#' 
+#'
 #' Interpolation is performed by linearly interpolating between the two nearest non-NA value. If the NAs are at the start or end of the time series, they are umputed as the value of the nearest non-NA value.
-#' 
+#'
 #' @param dates A vector of dates.
 #' @param x A vector of values.
-#' 
+#'
 #' @returns A vector of values with NAs imputed.
 impute_linear <- function(dates, x) {
   na_vals <- dates[is.na(x)]
   if (length(na_vals) == 0) return(x)
-  
+
   while (length(na_vals) > 0) {
     # Find the first NA
     first_na <- which(is.na(x))[1]
@@ -26,9 +26,9 @@ impute_linear <- function(dates, x) {
       } else {
         warning(paste0("There are ", next_non_na - first_na, " NA values in the middle of the time series. Consider more sophisticated imputation strategies first, such as imputeTS::na_kalman() or multivariate imputation."))
       }
-    } 
+    }
 
-    if (next_non_na >= length(x)) { 
+    if (next_non_na >= length(x)) {
       # If there are NAs at the end of the time series, fill them in with the most recent non-NA value
       x[first_na:length(x)] <- x[first_na - 1]
     } else if (first_na == 1) {

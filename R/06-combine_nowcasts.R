@@ -49,7 +49,7 @@ combine_nowcasts <- function(dadnow1, dadnow2) {
   for (i in seq_along(return_value$models)) {
     return_value$models[[i]]$model_id <- model_ids[i]
   }
-  
+
   return(return_value)
 }
 

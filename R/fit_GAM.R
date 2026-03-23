@@ -20,19 +20,19 @@ fit_GAM <- function(
   } else {
     family <- params$family
   }
-  
+
   if (!"smooths" %in% names(params)) {
     smooths <- list()
   } else {
     smooths <- params$smooths
   }
-  
+
   if (!"bs" %in% names(params)) {
     bs <- "tp"
   } else {
     bs <- params$bs
   }
-  
+
   if (length(smooths) > 0) {
     formula_terms <- vector(mode = "list", length = length(smooths))
     for (smooth in names(smooths)) {

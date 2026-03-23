@@ -1,7 +1,7 @@
 #' Get the underlying model from a dadnow object
-#' 
+#'
 #' @param dadnow A dadnow object.
-#' 
+#'
 #' @returns The underlying model, in it's original form.
 #' @export
 get_model <- function(dadnow, model) {
@@ -12,10 +12,10 @@ get_model <- function(dadnow, model) {
 }
 
 #' Get the predictions from a dadnow object
-#' 
+#'
 #' @param dadnow A dadnow object.
 #' @param models A model name or vector of model names. Must correspond to the names of the models seen in the evaluations table. Note that the model names can change depending on the other models added to the dadnow object, so always double check.
-#' 
+#'
 #' @returns A matrix of predictions, with rows as dates and columns as models.
 #' @export
 get_predictions <- function(dadnow, models = NULL) {
@@ -27,8 +27,8 @@ get_predictions <- function(dadnow, models = NULL) {
     df <- data.frame(
       date = x$prepped_data$dates_nowcast,
       prediction = as.numeric(x$prediction$prediction),
-      lower = x$enbpi[, 1],
-      upper = x$enbpi[, 2],
+      lower = x$prediction$lower,
+      upper = x$prediction$upper,
       model_id = x$model_id
     )
     rownames(df) <- NULL
