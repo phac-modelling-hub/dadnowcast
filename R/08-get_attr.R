@@ -1,26 +1,42 @@
 #' Get the underlying model from a dadnow object
 #'
 #' @param dadnow A dadnow object.
+#' @param model_id The model id to use for the model.
 #'
 #' @returns The underlying model, in it's original form.
 #' @export
-get_model <- function(dadnow, model) {
-  if (length(model) != 1) {
+get_model <- function(dadnow, model_id) {
+  if (length(model_id) != 1) {
     stop("Only one model can be extracted from a dadnow object at a time.")
   }
-  dadnow$models[[model]]$model
+  dadnow$models[[model_id]]$model
 }
+
+#' Get the formula used in the underlying model from a dadnow object
+#'
+#' @param dadnow A dadnow object.
+#' @param model_id The model id to use for the model.
+#'
+#' @returns The underlying model, in it's original form.
+#' @export
+get_formula <- function(dadnow, model_id) {
+  if (length(model_id) != 1) {
+    stop("Only one model can be extracted from a dadnow object at a time.")
+  }
+  dadnow$models[[model_id]]$formula
+}
+
 
 #' Get the predictions from a dadnow object
 #'
 #' @param dadnow A dadnow object.
-#' @param models A model name or vector of model names. Must correspond to the names of the models seen in the evaluations table. Note that the model names can change depending on the other models added to the dadnow object, so always double check.
+#' @param model_ids A model name or vector of model names. Must correspond to the model ids seen in the evaluations table. Note that the model names can change depending on the other models added to the dadnow object, so always double check.
 #'
 #' @returns A matrix of predictions, with rows as dates and columns as models.
 #' @export
-get_predictions <- function(dadnow, models = NULL) {
-  if (!is.null(models)) {
-    dadnow <- extract(dadnow, models)
+get_predictions <- function(dadnow, model_ids = NULL) {
+  if (!is.null(model_ids)) {
+    dadnow <- extract(dadnow, model_ids)
   }
 
   preds <- lapply(dadnow$models, function(x) {

@@ -54,7 +54,6 @@ autoplot.multidadnow <- function(multidadnow, se = FALSE, last_n = Inf, alpha = 
           y = !!sym(multidadnow$response)
         ),
         colour = "grey",
-        size   = 1,
         inherit.aes = FALSE
       )
   }

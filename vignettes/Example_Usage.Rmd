@@ -72,7 +72,7 @@ autoplot(dadnow2, last_n = 25, se = TRUE) +
 
 The evaluations can easily be extracted and plotted:
 
-```{r}
+```{r evals}
 evals <- get_evals(dadnow2)
 
 ggplot(evals) +
@@ -85,7 +85,7 @@ The package includes a "mechanistic" model, which can be seen in `vignette("Mech
 
 Note that the mechanistic assumption is sensitive to the values of sc and sp, and there will often be warnings about lack of convergence in the optimization process.
 
-```{r}
+```{r mech}
 mech <- nowcast(
   model = "mechanistic",
   dad ~ cnisp + ptsos + npos, df, date_col = "date",
@@ -96,7 +96,7 @@ mech
 
 In addition to `add_nowcast()` and `add_mechanistic()`, which adds a single model to a "multidadnow" object, there is also a `combine_nowcasts` function, which combines two "multidadnow" objects.
 
-```{r}
+```{r combine}
 dadnow3 <- combine_nowcasts(dadnow2, mech) |>
   add_nowcast(formula = dad ~ cnisp + ptsos + npos, model = "mechanistic", params = list(sc = 0.2, sp = 0.3, method = "normal")) |>
   add_nowcast(formula = dad ~ cnisp + ptsos + npos, model = "mechanistic", params = list(sc = 0.2, sp = 0.3, method = "poisson"))
@@ -108,7 +108,7 @@ autoplot(dadnow3, last_n = 5)
 The `add_nowcast()` interface allows for new formulas to be specified when adding new models. 
 
 
-```{r}
+```{r patchwork}
 library(patchwork)
 gg_ptsos <- ggplot(df, aes(x = date, y = ptsos)) + geom_line()
 gg_cnisp <- ggplot(df, aes(x = date, y = cnisp)) + geom_line()
@@ -123,8 +123,8 @@ The data can be extracted from the "multidadnow" object using the `get_predictio
 
 The data can be extracted from the "multidadnow" object in order to check for patterns in the predictions:
 
-```{r}
-train_preds <- get_data(dadnow2, include_training = TRUE)
+```{r partial_regression_plots}
+train_preds <- get_data(dadnow3, include_training = TRUE)
 
 gg_npos <- ggplot(train_preds, aes(x = npos, y = dad, colour = model_id)) + geom_point()
 gg_ptsos <- ggplot(train_preds, aes(x = ptsos, y = dad, colour = model_id)) + geom_point()
@@ -135,7 +135,7 @@ gg_npos + gg_ptsos + gg_cnisp + plot_layout(ncol = 2, guides = "collect")
 
 And residual plots for the training data can be made as follows. Note that there's no concept of residuals for nowcasts since we don't have an observed y value. If desired, the enbpi function could be changed to output all of the predictions and residuals for more fine-grained inspection of how each model is fitting.
 
-```{r}
+```{r resids}
 resids <- get_residuals(dadnow2)
 
 ggplot(resids, aes(x = fitted_value, y = residual, colour = model_id)) +
@@ -160,7 +160,7 @@ This is similar to k-fold cross-validation, but targeted to a nowcasting scenari
 
 The parameters for EnBPI can be specified in the nowcast function, then `add_nowcast()` will read those parameters and use them for any additional nowcasts. The defaults are shown below in `dadnow4`. If two sets of `multidadnow` objects have different values for `batches`, `train_window`, or `level`, then `combine_nowcasts()` will fail since the results are not comparable. 
 
-```{r}
+```{r enbpi_args}
 system.time(
   dadnow4 <- nowcast(
     dad ~ lag(cnisp, 3) + lag(ptsos, 3),
@@ -189,20 +189,33 @@ tryCatch(
 
 A "multidadnow" object is just a list, where certain information that is common to all models are at the highest level, and the models themselves are stored in a list within the object.
 
-```{r}
+```{r dadnow_structure}
 names(dadnow2)
 
 ```
 
-```{r}
+```{r dadnow_model_structure}
 names(dadnow2$models)
 ```
 
 It is most convenient to use the `get_model()` and `get_predictions()` functions to extract information from the "multidadnow" object, but you can also directly access the list elements.
 
-```{r}
+```{r accessing_models}
 dadnow2$models[["f1_lm"]]$model
 get_model(dadnow2, "f1_lm")
 ```
 
+In the lm above, you'll notice that the lag terms were expanded into the model matrix. If you want to use other data to make predictions, you can use the `prep_newdata()` function to create a data frame with the data that lm expects. This can be used to, say, make predictions for one province based on a model fit to a different province.
 
+```{r}
+new_data <- prep_newdata(
+  formula = get_formula(dadnow2, "f1_lm"),
+  data = df,
+  date_col = "date",
+  interpolate = TRUE
+)
+
+# Note: the three NA values are because of the lag terms.
+predict(get_model(dadnow2, "f1_lm"), newdata = new_data) |> head()
+
+```

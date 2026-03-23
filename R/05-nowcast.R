@@ -94,7 +94,7 @@ nowcast <- function(
   nowcasted_data <- aug_data[(nrow(X_train) + 1):nrow(aug_data), ]
   nowcasted_data[, prepped_data$response] <- nowcast$prediction$prediction
   nowcasted_data$model <- ifelse(
-    model == "mechanistic", yes = paste0("mech_", params$method), no =model
+    model == "mechanistic", yes = paste0("mech_", params$method), no = model
   )
   nowcasted_data$params <- paste0(names(params), params, collapse = "_")
   nowcasted_data$pi_lower <- nowcast$prediction$prediction +
@@ -124,7 +124,7 @@ nowcast <- function(
     models = list(
       list(
         model_id = make_model_id(enbpi$evals),
-        model_name = model,
+        model_name = nowcasted_data$model[1],
         formula = formula,
         prepped_data = prepped_data,
         model = nowcast$model,
