@@ -39,9 +39,9 @@ enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, tra
     preds[[i]] <- dispatch_model(model)(X_train = X_train_k, Y_train = y_train_k, X_nowcast = X_test_k, params = params)$prediction$prediction
     resids[[i]] <- y_test_k - preds[[i]]
 
-    rmse[i] <- sqrt(mean((y_test_k - preds[[i]])^2))
-    mae[i] <- mean(abs(y_test_k - preds[[i]]))
-    mre[i] <- mean(((y_test_k - preds[[i]]) / (y_test_k + 0.1))^2)
+    rmse[i] <- sqrt(mean((resids[[i]])^2))
+    mae[i] <- mean(abs(resids[[i]]))
+    mre[i] <- mean(((resids[[i]]) / (y_test_k + 0.1))^2)
   }
 
   # Get the standard deviation of the residuals for each step ahead.

@@ -7,15 +7,20 @@
 #' @importFrom ggplot2 autoplot
 #' @export
 autoplot.multidadnow <- function(multidadnow, se = FALSE, last_n = Inf, alpha = 0.2) {
-  plot_data <- multidadnow$data[!is.na(multidadnow$data[, multidadnow$response]), ]
+  plot_data <- get_data(multidadnow, include_training = TRUE)
+  plot_data <- plot_data[!is.na(plot_data[, multidadnow$response]), ]
 
   # Get the training data, and only plot the last n observations.
   training_data <- plot_data[plot_data$model == "Training", ]
   if (last_n < nrow(training_data)) {
     training_data <- training_data[(nrow(training_data) - last_n):nrow(training_data), ]
   }
-  # Remove the model column so that it applies to all facets, if used.
+  # Remove columns so that the training data is plotted all facets.
   training_data$model <- NULL
+  training_data$formula <- NULL
+  training_data$model_id <- NULL
+  training_data$params <- NULL
+
 
   plot_data <- plot_data[plot_data$model != "Training", ]
 

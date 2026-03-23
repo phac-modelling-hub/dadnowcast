@@ -90,4 +90,16 @@ get_data <- function(dadnow, include_training = TRUE) {
   }
   df
 }
-  
+
+#' Get the evaluation metrics from a dadnow object
+#'
+#' @param dadnow A dadnow object.
+#'
+#' @returns A data frame with the evaluation metrics.
+#' @export
+get_evals <- function(dadnow) {
+  evals <- dadnow$evals
+  evals$model_id <- rownames(evals)
+
+  evals
+}

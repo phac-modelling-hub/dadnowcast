@@ -34,7 +34,6 @@ The formula interface is used to specify the response variable and covariates, a
 
 The `add_nowcast()` interface allows for new formulas to be specified when adding new models. Notice that a message will be displayed if no formula is specified, in whiuch case the formula from the first registered model will be used.
 
-There's also an `autoplot()` method for "multidadnow" objects, which plots the nowcast against the observed data. By default, it plots all training data in the "multidadnow" object, but the `last_n` argument can be used to specify how many of the most recent observations to plot.
 
 ```{r nowcast}
 dadnow2 <- nowcast(
@@ -49,17 +48,37 @@ dadnow2 <- add_nowcast(dadnow2, model = "ar", params = list(order = 2)) |>
   add_nowcast("lm") |>
   add_nowcast("lm", formula = dad ~ cnisp + ptsos + npos) |>
   add_nowcast("arx", params = list(order = 1)) |>
+  add_nowcast("arx", formula = dad ~ npos, params = list(order = 1)) |>
+  add_nowcast("arx", formula = dad ~ npos, params = list(order = 2)) |>
   add_nowcast("gam", params = list(smooths = list("cnisp_lag0"=10))) |>
   add_nowcast("rf", formula = dad ~ lag(cnisp, 2), params = list(ntree = 50, mtry = 3))
 
 dadnow2 <- add_nowcast(dadnow2, model = "xgboost", params = list(nrounds = 10))
 
 dadnow2
+```
 
+
+There's also an `autoplot()` method for "multidadnow" objects, which plots the nowcast against the observed data. By default, it plots all training data in the "multidadnow" object, but the `last_n` argument can be used to specify how many of the most recent observations to plot.
+
+The function uses the same data as the output of `get_data()`, so the data can be extracted from the "multidadnow" object and used in the plot.
+
+```{r autoplot}
 autoplot(dadnow2, last_n = 25, se = TRUE) +
   theme_bw() +
-  facet_wrap( ~ model)
+  facet_wrap(formula ~ model)
 
+```
+
+The evaluations can easily be extracted and plotted:
+
+```{r}
+evals <- get_evals(dadnow2)
+
+ggplot(evals) +
+  aes(x = reorder(model_id, mae), y = mae, fill = model) +
+  geom_col() +
+  theme_bw()
 ```
 
 The package includes a "mechanistic" model, which can be seen in `vignette("Mechanistic_Model", package = "fatherStay")`. The model takes the parameters `sc` and `sp` and requires a method ("normal", "poisson", or "negbinom") to specify the distribution of the error term. Because it works slightly differently than the other models, it is added to a "multidadnow" object using the `add_mechanistic` function, which takes the same formula interface as `nowcast` but with different parameters. The mechanistic model can be added alongside the other models, and the same plotting and evaluation functions can be used.
@@ -83,7 +102,7 @@ dadnow3 <- combine_nowcasts(dadnow2, mech) |>
   add_nowcast(formula = dad ~ cnisp + ptsos + npos, model = "mechanistic", params = list(sc = 0.2, sp = 0.3, method = "poisson"))
 
 dadnow3
-#autoplot(dadnow3, last_n = 5)
+autoplot(dadnow3, last_n = 5)
 ```
 
 The `add_nowcast()` interface allows for new formulas to be specified when adding new models. 
@@ -114,7 +133,7 @@ gg_cnisp <- ggplot(train_preds, aes(x = cnisp, y = dad, colour = model_id)) + ge
 gg_npos + gg_ptsos + gg_cnisp + plot_layout(ncol = 2, guides = "collect")
 ```
 
-And residual plots can be made as follows:
+And residual plots for the training data can be made as follows. Note that there's no concept of residuals for nowcasts since we don't have an observed y value. If desired, the enbpi function could be changed to output all of the predictions and residuals for more fine-grained inspection of how each model is fitting.
 
 ```{r}
 resids <- get_residuals(dadnow2)
@@ -133,13 +152,13 @@ From each batch, we have a set of predictions compared to actual values. The sta
 
 This is similar to k-fold cross-validation, but targeted to a nowcasting scenario. With k-fold CV, the data into k folds and we predict all of the data from each fold. This does not take the ordering of the data into account, and the evaluation metrics are based on the amounts of data in each fold (for example, in 10-fold CV, each fold has 1/10 of the data). EnBPI takes the ordering into account and also finds metrics (RMSE, MAE, and MRE) based on exactly the sort of predictions that we are making.
 
-- More batches means more accurate prediction intervals, but also more computationally intensive.
-- 60% of the training data is used for each batch, leaving space for a variety of intervals while also using enough of the data for training.
+- More `batch`es means more accurate prediction intervals, but also more computationally intensive.
+- The default `train_window` uses 60% of the training data is used for each batch, leaving space for a variety of intervals while also using enough of the data for training.
     - To see why, consider the case where we have 100 data points, 5-step ahead predictions, and we use 95% of the data in each batch. Since we need space to do 5-step ahead predictions, every single batch is going to be the first 95 data points! If we used 60% instead, then the batches will have starting indices anywhere between 0 and 45, so we have a greater variety of k-step ahead predictions.
     - If we used 5% of the data in each batch, we would be training on only 5 data points each time, which is not a good reflection of the amount of data that we actually have.
-- The `level` is just the prediction interval level. The prediction intervals are calculated based on an asymptotic normality assumption: the standard error ($SE$) is caclulated empirically, then the interval is calculated as $\hat y \pm z_{(1 - \texttt{level})/2} SE$.
+- The `level` is the prediction interval level. The prediction intervals are calculated based on an asymptotic normality assumption: the standard error ($SE$) is caclulated empirically, then the interval is calculated as $\hat y \pm z_{(1 - \texttt{level})/2} SE$.
 
-The parameters for EnBPI can be specified in the nowcast function, then `add_nowcast()` will read those parameters and use them for any additional nowcasts. The defaults are shown below. If two sets of `multidadnow` objects have different values for `batches`, `train_window`, or `level`, then `combine_nowcasts()` will fail since the results are not comparable. 
+The parameters for EnBPI can be specified in the nowcast function, then `add_nowcast()` will read those parameters and use them for any additional nowcasts. The defaults are shown below in `dadnow4`. If two sets of `multidadnow` objects have different values for `batches`, `train_window`, or `level`, then `combine_nowcasts()` will fail since the results are not comparable. 
 
 ```{r}
 system.time(
@@ -156,6 +175,11 @@ system.time(
     df, model = "ar", date_col = "date", params = list(order = 1),
     batches = 100, train_window = NULL, level = 0.95
   )
+)
+
+tryCatch(
+  combine_nowcasts(dadnow4, dadnow5),
+  error = function(e) e
 )
 ```
 
