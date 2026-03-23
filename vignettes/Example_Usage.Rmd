@@ -32,7 +32,7 @@ The basic usage of the package involves the "nowcast" function, which fits a sin
 
 The formula interface is used to specify the response variable and covariates, and lags can be specified using the "lag" function within the formula. The function converts the data into a standard format across all models so that a single "multidadnow" object can be used to store the results of multiple models, and the same plotting and evaluation functions can be used regardless of the underlying model.
 
-The `add_nowcast()` interface allows for new formulas to be specified when adding new models. Notice that a message will be displayed if no formula is specified, in whiuch case the formula from the first registered model will be used.
+The `add_nowcast()` interface allows for new formulas to be specified when adding new models. Notice that a message will be displayed if no formula is specified, in which case the formula from the first registered model will be used.
 
 
 ```{r nowcast}
@@ -105,8 +105,6 @@ dadnow3
 autoplot(dadnow3, last_n = 5)
 ```
 
-The `add_nowcast()` interface allows for new formulas to be specified when adding new models. 
-
 
 ```{r patchwork}
 library(patchwork)
@@ -152,10 +150,10 @@ From each batch, we have a set of predictions compared to actual values. The sta
 
 This is similar to k-fold cross-validation, but targeted to a nowcasting scenario. With k-fold CV, the data into k folds and we predict all of the data from each fold. This does not take the ordering of the data into account, and the evaluation metrics are based on the amounts of data in each fold (for example, in 10-fold CV, each fold has 1/10 of the data). EnBPI takes the ordering into account and also finds metrics (RMSE, MAE, and MRE) based on exactly the sort of predictions that we are making.
 
-- More `batch`es means more accurate prediction intervals, but also more computationally intensive.
-- The default `train_window` uses 60% of the training data is used for each batch, leaving space for a variety of intervals while also using enough of the data for training.
-    - To see why, consider the case where we have 100 data points, 5-step ahead predictions, and we use 95% of the data in each batch. Since we need space to do 5-step ahead predictions, every single batch is going to be the first 95 data points! If we used 60% instead, then the batches will have starting indices anywhere between 0 and 45, so we have a greater variety of k-step ahead predictions.
-    - If we used 5% of the data in each batch, we would be training on only 5 data points each time, which is not a good reflection of the amount of data that we actually have.
+- More `batches` means more accurate prediction intervals, but also more computationally intensive.
+- The default `train_window` uses 60% of the training data for each batch, leaving space for a variety of intervals while also using enough of the data for training.
+    - To see why, consider the case where we have 100 data points, 5-step ahead predictions, and we use 95% of the data in each batch. Since we need space to do 5-step ahead predictions, every single batch is going to be the first 95 data points! If we used 60% instead, then the batches will have starting indices anywhere between 0 and 35, so we have a greater variety of k-step ahead predictions.
+    - If we used 5% of the data in each batch, we would have lots of variety in the nowcasts, but we would be training on only 5 data points each time, which is not a good reflection of the amount of data that we actually have.
 - The `level` is the prediction interval level. The prediction intervals are calculated based on an asymptotic normality assumption: the standard error ($SE$) is caclulated empirically, then the interval is calculated as $\hat y \pm z_{(1 - \texttt{level})/2} SE$.
 
 The parameters for EnBPI can be specified in the nowcast function, then `add_nowcast()` will read those parameters and use them for any additional nowcasts. The defaults are shown below in `dadnow4`. If two sets of `multidadnow` objects have different values for `batches`, `train_window`, or `level`, then `combine_nowcasts()` will fail since the results are not comparable. 
