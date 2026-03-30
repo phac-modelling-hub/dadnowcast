@@ -10,10 +10,9 @@
 #' @param k The number of steps ahead to predict. If NULL, the number of steps is determined by the amount of data to be nowcast.
 #' @param batches The number of batches to use for training (akin to the number of folds for k-fold cross validation).
 #' @param train_window The number of days to use for training. Defaults to 60% of the training data, which allows for a large training set for each batch while also allowing for a reasonable amount of variation in the test sets.
-#' @param level The prediction interval level.
 #'
 #' @returns A list containing the k-step ahead prediction standard errors and the evaluations of the models for the k-step ahead predictions.
-enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, train_window = NULL, level = 0.95) {
+enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, train_window = NULL) {
 
   # If the train_window is not specified, set it to 60% of the training data
   if (is.null(train_window)) train_window <- floor(0.6 * length(y_train))

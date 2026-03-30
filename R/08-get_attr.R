@@ -39,21 +39,7 @@ get_predictions <- function(dadnow, model_ids = NULL) {
     dadnow <- extract(dadnow, model_ids)
   }
 
-  preds <- lapply(dadnow$models, function(x) {
-    df <- data.frame(
-      date = x$prepped_data$dates_nowcast,
-      prediction = as.numeric(x$prediction$prediction),
-      lower = x$prediction$lower,
-      upper = x$prediction$upper,
-      model_id = x$model_id
-    )
-    rownames(df) <- NULL
-    df
-  })
-  preds <- do.call(rbind, preds)
-  rownames(preds) <- dadnow$data$dates_nowcast
-
-  preds
+  get_data(dadnow, include_training = FALSE)
 }
 
 #' Get the residuals from each model in a dadnow object
@@ -78,7 +64,6 @@ get_residuals <- function(dadnow) {
   residuals <- do.call(rbind, residuals)
   rownames(residuals) <- NULL
 
-  
   residuals
 }
 
@@ -90,22 +75,20 @@ get_residuals <- function(dadnow) {
 #' @returns A data frame with the predictions.
 #' @export
 get_data <- function(dadnow, include_training = TRUE) {
-  if (include_training) {
-    df <- dadnow$data
-  } else {
-    df <- dadnow$data[dadnow$data$model != "Training", ]
-  }
 
-  df$model_id <- NULL
-  for (model in dadnow$models) {
-    param_string <- paste0(names(model$params), model$params, collapse = "_")
-    condition <- df$model == model$model_name & df$formula == model$formula & df$params == param_string
-    if (any(condition)) {
-      df[condition, "model_id"] <- model$model_id
-    }
+  nowcasted_data <- lapply(dadnow$models, function(x) {
+    df <- x$nowcasted_data
+    df$model_id <- x$model_id
+    df
+})
+  nowcasted_data <- do.call(rbind, nowcasted_data)
+  if (include_training) {
+    train <- dadnow$data[1:length(dadnow2$models[[1]]$prepped_data$dates_train), ]
+    train$model_id = NA
+    nowcasted_data <- rbind(train, nowcasted_data)
   }
-  df
-}
+  nowcasted_data
+  }
 
 #' Get the evaluation metrics from a dadnow object
 #'

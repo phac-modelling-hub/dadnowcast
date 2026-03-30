@@ -2,7 +2,7 @@
 #'
 #' @param formula A formula, e.g. y ~ x, y ~ lag(x1, 1) + lag(x2, 3)
 #' @param data A data frame. Must contain the variables specified in the formula and in `date_col`. Trailing NA values in `y` will be nowcasted.
-#' @param model The model to use for nowcasting. See `vignette("Model_Details", package = "fatherStay")` and `vignette("Mechanistic_Model", package = "fatherStay")` for more information about currently implemented models, and `vignette("Write_fit_XX_functions", package = "fatherStay")` for how to write your own model for use in this package.
+#' @param model The model to use for nowcasting. See `vignette("Model_Details", package = "dadnowcast")` and `vignette("Mechanistic_Model", package = "dadnowcast")` for more information about currently implemented models, and `vignette("Write_fit_XX_functions", package = "dadnowcast")` for how to write your own model for use in this package.
 #' @param batches The number of batches to use for training in the EnbPI calculation (akin to the number of folds for k-fold cross validation).
 #' @param train_window The number of days to use for training. Defaults to 60% of the training data, which allows for a large training set for each batch while also allowing for a reasonable amount of variation in the test sets.
 #' @param level The prediction interval level.
@@ -20,7 +20,7 @@
 #' - "rf", a random forest model, a tree based model that grows many trees and combines the output to pick a prediction, it takes parameters `ntree` the number of trees to grow, `mtry` the number of variables used as candidates at each split, `weights` weights the sample data, `replace` should sampling be done with or without replacement, `maxnodes` limits the number of terminal nodes, `nodesize` sets the minimum size of the terminal nodes.
 #' - "xgboost", a extreme gradient boosting model, which is a tree based model in which subsequent trees learn from previous trees, it takes parameters `nrounds` which is the number of boosting iteration to do, and `XGBparams` a list of more parameters used in the model the most important of which is `max_depth` both `nrounds` and `max_depth` are tuned if their values are not specified, it also takes `verbose` should output be silent (0) or not (1).
 #' - "mechanistic", creates a mechanistic model, `sc`, `sp`, and `method` specifies the family.
-#' - See `vignette("Write_fit_XX_functions", package = "fatherStay")` for how to write your own model for use in this package.
+#' - See `vignette("Write_fit_XX_functions", package = "dadnowcast")` for how to write your own model for use in this package.
 #'
 #'
 #' @returns An object of class "`dadnow`".
@@ -70,8 +70,7 @@ nowcast <- function(
     params = params,
     k = nrow(X_now),
     batches = batches,
-    train_window = train_window,
-    level = level
+    train_window = train_window
   )
 
   # Fit to all training, create nowcast
@@ -86,6 +85,8 @@ nowcast <- function(
   # Take the training data and add the nowcasted data to it.
   # Format it so that it's just the columns used in the formula.
   aug_data <- as.data.frame(data)
+  # FIXME: Different models have different covariates; imputation will miss some.
+  # Later, when models are added, the covariate rows will not be duplicated. 
   for (covariate in prepped_data$covariates) {
     aug_data[[covariate]] <- impute_linear(dates = aug_data[, prepped_data$date_col], x = aug_data[[covariate]])
   }
@@ -98,9 +99,9 @@ nowcast <- function(
   )
   nowcasted_data$params <- paste0(names(params), params, collapse = "_")
   nowcasted_data$pi_lower <- nowcast$prediction$prediction +
-    qnorm(1 - (1 - level)/2) * enbpi$se
-  nowcasted_data$pi_upper <- nowcast$prediction$prediction +
     qnorm((1 - level)/2) * enbpi$se
+  nowcasted_data$pi_upper <- nowcast$prediction$prediction +
+    qnorm(1 - (1 - level)/2) * enbpi$se
   nowcasted_data$formula <- deparse(formula)
 
   aug_data$model <- "Training"
@@ -112,7 +113,7 @@ nowcast <- function(
 
   # Return the dadnow object
   # This started with much fewer entries, but adding things here
-  # made it easier to add new features.
+  # made it easier to add new features elsewhere.
   dadnow <- list(
     date_col = date_col,
     data = aug_data,
@@ -127,11 +128,12 @@ nowcast <- function(
         model_name = nowcasted_data$model[1],
         formula = formula,
         prepped_data = prepped_data,
+        nowcasted_data = nowcasted_data,
         model = nowcast$model,
         predictions = nowcast$prediction,
         fitted_values = nowcast$fitted_values,
         evals = enbpi$evals,
-        enbpi = enbpi$enbpi,
+        enbpi_se = enbpi$se,
         params = params
       )
     )
@@ -172,7 +174,7 @@ make_model_id <- function(evals) {
 
 #' Choose a model to use for nowcasting
 #'
-#' @param model The model to use for nowcasting. If not specified, the function attempts to find a function called `model`. See `vignette("Write_fit_XX_functions", package = "fatherStay")` for how to write your own model for use in this package.
+#' @param model The model to use for nowcasting. If not specified, the function attempts to find a function called `model`. See `vignette("Write_fit_XX_functions", package = "dadnowcast")` for how to write your own model for use in this package.
 dispatch_model <- function(model) {
   switch(model,
     "lm" = fit_lm,
