@@ -8,6 +8,6 @@
 #' @returns ARIMA model object, predictions, and fitted values of the model on the training data
 
 fit_arima <- function(Y_train, X_train = NULL, X_nowcast = NULL, params = list(p = 1, d = 0, q = 1)) {
-  # this is just a wrapper function that calls the fit_AR model with the proper parameters
-  fit_ar(Y_train, X_train, X_nowcast, params)
+  # this is just a wrapper function that calls the fit_ARX model with the proper parameters
+  fit_arx(Y_train, X_train, X_nowcast, params)
 }

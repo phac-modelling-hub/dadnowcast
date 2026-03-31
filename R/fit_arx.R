@@ -7,7 +7,53 @@
 #'
 #' @returns Arima model object, predictions, and fitted values of the model on training data
 
-fit_arx <- function(Y_train, X_train = NULL, X_nowcast = NULL, params = list(p = 1)) {
-  # this is just a wrapper function that calls the fit_AR model with the proper parameters
-  fit_ar(Y_train, X_train, X_nowcast, params)
+fit_arx <- function(Y_train, X_train = NULL, X_nowcast = NULL, params = list(p = 1, d = 0, q = 0, n.ahead = 1)) {
+  # retrieve the number of future predictions to make, if not specified, then will be based on the number of rows in the nowcast data
+  if (!"n.ahead" %in% names(params)) {
+    n <- nrow(data.frame(X_nowcast))
+  } else {
+    if (params$n.ahead >= nrow(data.frame(X_nowcast))) {
+      n <- params$n.ahead
+    } else {
+      n <- nrow(data.frame(X_nowcast))
+    }
+  }
+
+  # retrieve the values for `p`, `d`, and `q`, if not specified then they will be 1, 0, and 0 respectively
+  if (!"p" %in% names(params)) {
+    p <- 0
+  } else {
+    p <- params$p
+  }
+
+  if (!"d" %in% names(params)) {
+    d <- 0
+  } else {
+    d <- params$d
+  }
+
+  if (!"q" %in% names(params)) {
+    q <- 0
+  } else {
+    q <- params$q
+  }
+
+  # If the X_train and X_nowcast are NULL, then passing them into the ARIMA
+  #  function doesn't effect it at all, allowing us to use the same function for
+  #  AR and ARX models!
+
+  # create the AR model
+  AR_mod <- arima(Y_train, order = c(p, d, q), xreg = X_train)
+
+  # create the predictions
+  preds <- predict(AR_mod, n, X_nowcast)
+
+  # put the predictions into a data frame and add 95% confidence bands
+  predictions <- data.frame(prediction = as.numeric(preds$pred), lower = as.numeric(preds$pred - 1.96 * preds$se), upper = as.numeric(preds$pred + 1.96 * preds$se))
+
+  # find the fitted values of the model
+  fitVals <- Y_train - AR_mod$residuals
+
+  # assemble the output in the correct format
+  list(model = AR_mod, prediction = predictions, fitted_values = fitVals)
 }
