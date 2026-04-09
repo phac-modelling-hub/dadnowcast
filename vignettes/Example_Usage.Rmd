@@ -201,21 +201,22 @@ names(dadnow2$models)
 It is most convenient to use the `get_model()` and `get_predictions()` functions to extract information from the "multidadnow" object, but you can also directly access the list elements.
 
 ```{r accessing_models}
-dadnow2$models[["f1_lm"]]$model
-get_model(dadnow2, "f1_lm")
+dadnow2$models[["lm_f1"]]$model
+get_model(dadnow2, "lm_f1")
 ```
 
 In the lm above, you'll notice that the lag terms were expanded into the model matrix. If you want to use other data to make predictions, you can use the `prep_newdata()` function to create a data frame with the data that lm expects. This can be used to, say, make predictions for one province based on a model fit to a different province.
 
 ```{r}
+
 new_data <- prep_newdata(
-  formula = get_formula(dadnow2, "f1_lm"),
+  formula = get_formula(dadnow2, "lm_f1"),
   data = df,
   date_col = "date",
   interpolate = TRUE
 )
 
 # Note: the three NA values are because of the lag terms.
-predict(get_model(dadnow2, "f1_lm"), newdata = new_data) |> head()
+predict(get_model(dadnow2, "lm_f1"), newdata = new_data) |> head()
 
 ```
