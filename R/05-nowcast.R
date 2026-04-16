@@ -89,8 +89,6 @@ nowcast <- function(
   # Take the training data and add the nowcasted data to it.
   # Format it so that it's just the columns used in the formula.
   aug_data <- as.data.frame(data)
-  # FIXME: Different models have different covariates; imputation will miss some.
-  # Later, when models are added, the covariate rows will not be duplicated. 
   for (covariate in prepped_data$covariates) {
     aug_data[[covariate]] <- impute_linear(dates = aug_data[, prepped_data$date_col], x = aug_data[[covariate]])
   }
@@ -131,7 +129,7 @@ nowcast <- function(
   # made it easier to add new features elsewhere.
   dadnow <- list(
     date_col = date_col,
-    data = aug_data,
+    data = as.data.frame(data),
     evals = enbpi$evals,
     response = response,
     batches = batches,

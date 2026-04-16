@@ -18,7 +18,7 @@ combine_nowcasts <- function(dadnow1, dadnow2) {
 
   # Combine the data, ensuring that there are no duplicate rows.
   data <- rbind(dadnow1$data, dadnow2$data)
-  data <- data[!duplicated(data), ]
+  data <- data[!duplicated(data[, c(dadnow1$date_col, dadnow1$response)]), ]
 
   # Combine the evaluations, renaming the models as necessary.
   evals1 <- dadnow1$evals
