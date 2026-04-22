@@ -36,7 +36,7 @@ get_formula <- function(dadnow, model_id) {
 #' Get the predictions from a dadnow object
 #'
 #' @param dadnow A dadnow object.
-#' @param model_ids A model name or vector of model names. Must correspond to the model ids seen in the evaluations table. Note that the model names can change depending on the other models added to the dadnow object, so always double check.
+#' @param model_ids A model name or vector of model names. Must correspond to the model ids seen in the evaluations table. Note that the model names can change depending on the other models added to the dadnow object, so always double check.n
 #'
 #' @returns A matrix of predictions, with rows as dates and columns as models.
 #' @export
@@ -93,8 +93,9 @@ get_data <- function(dadnow, include_training = TRUE) {
   nowcasted_data <- do.call(rbind, nowcasted_data)
   if (include_training) {
     train <- dadnow$data[1:length(dadnow$models[[1]]$prepped_data$dates_train), ]
-    train$model_id = NA
-    nowcasted_data <- rbind(train, nowcasted_data)
+    train$model_id = "Training"
+    train$model <- "Training"
+    nowcasted_data <- dplyr::bind_rows(train, nowcasted_data)
   }
   nowcasted_data
 }
