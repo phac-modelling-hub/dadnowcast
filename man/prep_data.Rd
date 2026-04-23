@@ -38,3 +38,4 @@ Object of class dadnow
 \description{
 Prepare the data for analysis, returning an object ready for further analysis steps.
 }
+\keyword{internal}

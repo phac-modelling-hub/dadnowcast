@@ -4,10 +4,12 @@
 \alias{get_evals}
 \title{Get the evaluation metrics from a dadnow object}
 \usage{
-get_evals(dadnow)
+get_evals(dadnow, sort = "rmse")
 }
 \arguments{
 \item{dadnow}{A dadnow object.}
+
+\item{sort}{The metric to sort by. Defaults to "rmse",but can also be "mae" or "mre" or NULL.}
 }
 \value{
 A data frame with the evaluation metrics.

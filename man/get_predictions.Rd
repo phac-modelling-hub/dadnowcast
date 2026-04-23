@@ -9,7 +9,7 @@ get_predictions(dadnow, model_ids = NULL)
 \arguments{
 \item{dadnow}{A dadnow object.}
 
-\item{model_ids}{A model name or vector of model names. Must correspond to the model ids seen in the evaluations table. Note that the model names can change depending on the other models added to the dadnow object, so always double check.}
+\item{model_ids}{A model name or vector of model names. Must correspond to the model ids seen in the evaluations table. Note that the model names can change depending on the other models added to the dadnow object, so always double check.n}
 }
 \value{
 A matrix of predictions, with rows as dates and columns as models.

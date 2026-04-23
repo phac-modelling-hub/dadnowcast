@@ -12,3 +12,4 @@ find_nas(y)
 \description{
 Return the number of NA's at the end of a vector (internal)
 }
+\keyword{internal}

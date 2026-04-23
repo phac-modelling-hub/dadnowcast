@@ -13,7 +13,7 @@ enbpi(
   k,
   batches = 40,
   train_window = NULL,
-  level = 0.95
+  se = TRUE
 )
 }
 \arguments{
@@ -32,8 +32,6 @@ enbpi(
 \item{batches}{The number of batches to use for training (akin to the number of folds for k-fold cross validation).}
 
 \item{train_window}{The number of days to use for training. Defaults to 60\% of the training data, which allows for a large training set for each batch while also allowing for a reasonable amount of variation in the test sets.}
-
-\item{level}{The prediction interval level.}
 }
 \value{
 A list containing the k-step ahead prediction standard errors and the evaluations of the models for the k-step ahead predictions.

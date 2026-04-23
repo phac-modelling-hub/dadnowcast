@@ -4,7 +4,12 @@
 \alias{fit_arx}
 \title{Fit an ARX model on given data and make predictions for a given set of data}
 \usage{
-fit_arx(Y_train, X_train = NULL, X_nowcast = NULL, params = list(p = 1))
+fit_arx(
+  Y_train,
+  X_train = NULL,
+  X_nowcast = NULL,
+  params = list(p = 1, d = 0, q = 0, n.ahead = 1)
+)
 }
 \arguments{
 \item{params}{Named list with additional parameters: \code{p} Integer indicating the number of parameters for the AR model}

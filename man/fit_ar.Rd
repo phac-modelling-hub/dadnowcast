@@ -4,12 +4,7 @@
 \alias{fit_ar}
 \title{Fit an AR model on given data and make predictions for a given set of data with options for using an AR, ARX, or ARIMA model}
 \usage{
-fit_ar(
-  Y_train,
-  X_train = NULL,
-  X_nowcast = NULL,
-  params = list(p = 1, d = 0, q = 0, n.ahead = 1)
-)
+fit_ar(Y_train, X_train = NULL, X_nowcast = NULL, params = list(p = 1))
 }
 \arguments{
 \item{params}{A named list containing additional parameters: \code{p} Integer indicating the degree of the AR model, and \code{n.ahead} integer indicating the number of predictions to be make}

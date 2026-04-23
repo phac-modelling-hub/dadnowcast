@@ -12,7 +12,8 @@ nowcast(
   date_col = NULL,
   batches = 40,
   train_window = NULL,
-  level = 0.95
+  level = 0.95,
+  se = TRUE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ nowcast(
 \item{train_window}{The number of days to use for training. Defaults to 60\% of the training data, which allows for a large training set for each batch while also allowing for a reasonable amount of variation in the test sets.}
 
 \item{level}{The prediction interval level.}
+
+\item{se}{Should the standard errors and evaluation metrics be calculated by ensemble-based batch prediction intervals (EnbPI)? If FALSE, the function will return NAs for the standard errors and evaluation metrics. Can also be set to "theoretical" to use the theoretical prediction intervals for the model, if they are returned by the fit_*() function.}
 }
 \value{
 An object of class "\code{dadnow}".
