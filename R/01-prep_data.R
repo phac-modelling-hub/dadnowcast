@@ -1,3 +1,25 @@
+
+#' Check if any of the data columns are all NAs (all missing)
+#'
+#' @param data Dataframe of data as expected by the function \code{nowcast()}.
+#'
+#' @returns An error message 
+#' @keywords internal
+#'
+check_all_NAs <- function(data) {
+  x = sapply(1:ncol(data), FUN = function(i){
+    all(is.na(data[,i]))
+  })
+  
+  if(any(x)){
+    msg = paste('Invalid data! These column(s) have NAs only:',
+                paste(names(data)[which(x)], collapse = ', '))
+    stop(msg)
+  }
+}
+
+
+
 #' Prepare the data for analysis, returning an object ready for further analysis steps.
 #'
 #' @param formula A formula object.
@@ -10,12 +32,24 @@
 #' @param quiet Whether to print messages. Defaults to TRUE.
 #'
 #' @returns Object of class dadnow
+#' 
+#' @keywords internal
+#' 
 prep_data <- function(
-  formula, data, model, date_col = NULL, interpolate = TRUE, folds = 5,
-  cross_val_indices = NULL,
-  quiet = TRUE
+    formula, 
+    data, 
+    model, 
+    date_col = NULL, 
+    interpolate = TRUE, 
+    folds = 5,
+    cross_val_indices = NULL,
+    quiet = TRUE
 ) {
-  # Ensures data has a valid date column and that it's sorted by date
+  
+  check_all_NAs(data)
+  
+  # Ensures data has a valid date column and 
+  # that it's sorted by date
   data <- as.data.frame(data) |>
     parse_dates(date_col = date_col, quiet = quiet) |>
     dplyr::arrange(date)
@@ -24,7 +58,7 @@ prep_data <- function(
   diffs <- diffs[!is.na(diffs)]
 
   # Training and nowcasting data
-  response <- all.vars(formula)[1]
+  response   <- all.vars(formula)[1]
   covariates <- all.vars(formula)[-1]
   stopifnot(all(covariates %in% colnames(data)))
 
@@ -103,6 +137,9 @@ parse_dates <- function(data, date_col, quiet) {
 #' Return the number of NA's at the end of a vector (internal)
 #'
 #' @param y A vector of values with some number of NA's at the end of it.
+#' 
+#' @keywords internal
+#' 
 find_nas <- function(y) {
   which(rev(y) != "NA") |>
     min() - 1
