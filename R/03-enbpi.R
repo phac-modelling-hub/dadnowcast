@@ -59,11 +59,12 @@ enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, tra
     )
   }
 
-  preds <- vector(mode = "list", length = batches)
+  preds  <- vector(mode = "list", length = batches)
   resids <- vector(mode = "list", length = batches)
-  rmse <- vector(mode = "numeric", length = batches)
-  mae <- vector(mode = "numeric", length = batches)
-  mre <- vector(mode = "numeric", length = batches)
+  rmse   <- vector(mode = "numeric", length = batches)
+  mae    <- vector(mode = "numeric", length = batches)
+  mre    <- vector(mode = "numeric", length = batches)
+  
   for (i in 1:batches) {
     # Get the training data
     to_train <- train_indices[i]:(train_indices[i] + train_window)

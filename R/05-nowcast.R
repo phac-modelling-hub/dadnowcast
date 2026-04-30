@@ -42,6 +42,11 @@ nowcast <- function(
     formula, data, model, date_col = date_col
   )
 
+  if(any(is.na(prepped_data$y_train))){
+    warning('Training data `',prepped_data$response,
+         '` contains NAs. Remove them to enable residuals (MAE, RMSE, ...) calculation.')
+  }
+  
   # If mechanistic, warn that the formula needs a particular format.
   response <- prepped_data$response
   terms <- prepped_data$covariates
