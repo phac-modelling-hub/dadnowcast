@@ -110,7 +110,17 @@ get_data <- function(dadnow, include_training = TRUE) {
 get_evals <- function(dadnow, sort = "rmse") {
   evals <- dadnow$evals
   evals$model_id <- rownames(evals)
-  evals$model_long <- ifelse(evals$params == "", evals$model, paste0(evals$model_id, "_", evals$params))
+  evals$model_long <- paste0(
+    evals$model,'> [', 
+    evals$formula,'] ' ,
+    evals$params)
+  
+  evals$rank.mae   = order(evals$mae)
+  evals$rank.rmse  = order(evals$rmse)
+  evals$rank.mre   = order(evals$mre)
+  evals$sumranks   = rowSums(evals[,grepl('^rank', names(evals))])
+  # evals
+  
   if (!is.null(sort)) {
     return(evals[order(evals[, sort]), ])
   } else {
