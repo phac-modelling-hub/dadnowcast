@@ -13,7 +13,8 @@ nowcast(
   batches = 40,
   train_window = NULL,
   level = 0.95,
-  se = TRUE
+  se = TRUE,
+  quiet = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ nowcast(
 \item{level}{The prediction interval level.}
 
 \item{se}{Should the standard errors and evaluation metrics be calculated by ensemble-based batch prediction intervals (EnbPI)? If FALSE, the function will return NAs for the standard errors and evaluation metrics. Can also be set to "theoretical" to use the theoretical prediction intervals for the model, if they are returned by the fit_*() function.}
+
+\item{quiet}{Logical. If TRUE, silences all output messages.}
 }
 \value{
 An object of class "\code{dadnow}".

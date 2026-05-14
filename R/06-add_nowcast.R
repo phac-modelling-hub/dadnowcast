@@ -1,13 +1,18 @@
 #' Add a model to an existing dadnow or multidadnow object
 #'
-#' @param x A dadnow or multidadnow object.
 #' @param formula A formula object.
 #' @param model The model to use for nowcasting. Currently implemented: "lm", "ar". Can be a vector, in which case the model is trained for each model in the vector.
 #' @param params The parameters to use for the model. Must be a named list.
+#' @param multidadnow 
+#' @param quiet Logical. If TRUE, silences output messages.
 #'
 #' @returns A dadnow or multidadnow object with the model added.
 #' @export
-add_nowcast <- function(multidadnow, model, formula = NULL, params = NULL) {
+add_nowcast <- function(multidadnow, 
+                        model, 
+                        formula = NULL, 
+                        params = NULL,
+                        quiet = FALSE) {
 
   # If the multidadnow object has already been fit to data, the "data" already has nowcasts in it.
   # This removes the nowcasts, but keeps the training data (which includes the data to be nowcast, so "training" is a bit of a misnomer).
@@ -32,7 +37,8 @@ add_nowcast <- function(multidadnow, model, formula = NULL, params = NULL) {
     date_col = multidadnow$date_col,
     batches = multidadnow$batches,
     train_window = multidadnow$train_window,
-    level = multidadnow$level
+    level = multidadnow$level,
+    quiet = quiet
   )
 
   dadnow <- combine_nowcasts(multidadnow, new_dadnow)

@@ -4,16 +4,18 @@
 \alias{add_nowcast}
 \title{Add a model to an existing dadnow or multidadnow object}
 \usage{
-add_nowcast(multidadnow, model, formula = NULL, params = NULL)
+add_nowcast(multidadnow, model, formula = NULL, params = NULL, quiet = FALSE)
 }
 \arguments{
+\item{multidadnow}{}
+
 \item{model}{The model to use for nowcasting. Currently implemented: "lm", "ar". Can be a vector, in which case the model is trained for each model in the vector.}
 
 \item{formula}{A formula object.}
 
 \item{params}{The parameters to use for the model. Must be a named list.}
 
-\item{x}{A dadnow or multidadnow object.}
+\item{quiet}{Logical. If TRUE, silences output messages.}
 }
 \value{
 A dadnow or multidadnow object with the model added.
