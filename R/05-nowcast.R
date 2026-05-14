@@ -9,6 +9,7 @@
 #' @param params The parameters to use for the model. Must be a named list.
 #' @param date_col Name of the column containing date information. If NULL, the date information attempted to be inferred. If there's a single datetime column then it is used. If the data are a ts or mts or zoo object, the dates are esxtracted.
 #' @param se Should the standard errors and evaluation metrics be calculated by ensemble-based batch prediction intervals (EnbPI)? If FALSE, the function will return NAs for the standard errors and evaluation metrics. Can also be set to "theoretical" to use the theoretical prediction intervals for the model, if they are returned by the fit_*() function.
+#' @param quiet Logical. If TRUE, silences all output messages.
 #'
 #' @details
 #' A short overview of the specific models used here is given below, more details can be found in the vignette `Model_Details` and the individual help files (`?fit_*`, where `*` is the name of the model).
@@ -29,12 +30,13 @@
 #' @export
 nowcast <- function(
     formula, data, model, params = NULL, date_col = NULL,
-    batches = 40, train_window = NULL, level = 0.95, se = TRUE
+    batches = 40, train_window = NULL, level = 0.95, se = TRUE,
+    quiet = FALSE
   ) {
 
-  cat("Model:", model, "\n")
+  if(!quiet) cat("Model:", model, "\n")
 
-  # Retuns a list with all of the neceassry data.
+  # Returns a list with all of the necessary data.
   # This ends up duplicating the data within each model, but it makes it
   # easier to deal with models that have different formulas (and thus have different
   # training data sets).
