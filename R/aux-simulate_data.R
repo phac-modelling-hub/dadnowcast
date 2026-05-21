@@ -109,6 +109,7 @@ simulate_ar <- function(
 
 #' Simulate from the mechanistic model
 #'
+#' @param n The number of weeks to simulate. Default is 104 (2 years).
 #' @param ar1,ar2,sigma The AR parameters for the RVDSS.
 #' @param eta The scaling factor for the CNISP and PTSOS and DAD.
 #' @param sc,sp The scaling factors for the CNISP and PTSOS data.
@@ -117,6 +118,7 @@ simulate_ar <- function(
 #' @returns A dataframe with simulated data for DAD, CNISP, PTSOS, and RVDSS.
 #' @export
 simulate_mechanistic <- function(
+  n = 104,
   to_nowcast = 10,
   ar1 = 0.65, ar2 = 0.3, sigma = 0.1,
   eta = 0.2, sc = 0.2, sp = 0.3
@@ -125,7 +127,7 @@ simulate_mechanistic <- function(
 
   dates <- seq(
     lubridate::ymd("2020-01-01"),
-    lubridate::ymd("2021-12-31"),
+    lubridate::ymd("2020-01-01") + lubridate::weeks(n),
     by = "week"
   )
 
