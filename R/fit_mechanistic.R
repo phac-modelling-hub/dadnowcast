@@ -76,8 +76,12 @@ optim_negbinom <- function(Dt, Rt, Ct, Pt, sc = 0.2, sp = 0.3) {
 
 #' Fit a mechanistic model to the data
 #'
-#' @param X_train,Y_train,X_nowcast The data correspoding to DAD, CNISP, PTSOS, and RVDSS, respectively.
-#' @param params The parameters to use for the model. Must be a named list containing sc and sp and method (normal, poisson, or negbinom).
+#' @param Y_train The training data for the response variable DAD.
+#' @param X_train The training data for the explanatory variables CNISP, PTSOS, and RVDSS. 
+#' Must be a matrix or data frame with three columns in the order of CNISP, PTSOS, and RVDSS.
+#' @param X_nowcast The RVDSS data used to nowcast the DAD values. 
+#' @param params The parameters to use for the model. 
+#' Must be a named list containing sc and sp and method (normal, poisson, or negbinom).
 #'
 #' @returns A list with the parameter estimates and the negative log-likelihood.
 #'
@@ -112,8 +116,8 @@ fit_mechanistic <- function(
   Rt <- X_train[, 3]
   Rt_nowcast <- X_nowcast[, 3]
   optim_res <- switch(params$method,
-    "normal" = optim_normal(Dt, Rt, Ct, Pt, params$sc, params$sp),
-    "poisson" = optim_poisson(Dt, Rt, Ct, Pt, params$sc, params$sp),
+    "normal"   = optim_normal(Dt, Rt, Ct, Pt, params$sc, params$sp),
+    "poisson"  = optim_poisson(Dt, Rt, Ct, Pt, params$sc, params$sp),
     "negbinom" = optim_negbinom(Dt, Rt, Ct, Pt, params$sc, params$sp)
   )
   if (optim_res$convergence != 0) warning("Model did not converge.")

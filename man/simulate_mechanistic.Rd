@@ -5,6 +5,7 @@
 \title{Simulate from the mechanistic model}
 \usage{
 simulate_mechanistic(
+  n = 104,
   to_nowcast = 10,
   ar1 = 0.65,
   ar2 = 0.3,
@@ -15,6 +16,8 @@ simulate_mechanistic(
 )
 }
 \arguments{
+\item{n}{The number of weeks to simulate. Default is 104 (2 years).}
+
 \item{to_nowcast}{The number of days to nowcast.}
 
 \item{ar1, ar2, sigma}{The AR parameters for the RVDSS.}
