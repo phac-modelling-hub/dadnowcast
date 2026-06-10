@@ -34,7 +34,7 @@ autoplot.multidadnow <- function(
   # the top layer, so they come later.
   g <- ggplot2::ggplot() + 
     ggplot2::theme(
-      panel.grid = element_line(color = 'grey97')
+      panel.grid = ggplot2::element_line(color = 'grey97')
     )
   
   # Uncertainty ribbons
@@ -43,7 +43,7 @@ autoplot.multidadnow <- function(
       ggplot2::geom_ribbon(
         data = plot_data,
         mapping = ggplot2::aes(
-          x = !!sym(multidadnow$date_col),
+          x = !!rlang::sym(multidadnow$date_col),
           ymin = pi_lower,
           ymax = pi_upper,
           colour = model_id,
@@ -62,8 +62,8 @@ autoplot.multidadnow <- function(
       ggplot2::geom_step(
         data = training_data,
         mapping = ggplot2::aes(
-          x = !!sym(multidadnow$date_col),
-          y = !!sym(multidadnow$response)
+          x = !!rlang::sym(multidadnow$date_col),
+          y = !!rlang::sym(multidadnow$response)
         ),
         colour = "grey",
         inherit.aes = FALSE
@@ -73,8 +73,8 @@ autoplot.multidadnow <- function(
   g <- g + ggplot2::geom_line(
       data = plot_data,
       mapping = ggplot2::aes(
-        x = !!sym(multidadnow$date_col),
-        y = !!sym(multidadnow$response),
+        x = !!rlang::sym(multidadnow$date_col),
+        y = !!rlang::sym(multidadnow$response),
         colour = model_id,
         group = paste0(model, params, formula)
       ),
