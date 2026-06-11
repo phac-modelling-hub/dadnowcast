@@ -41,11 +41,10 @@ fit_gam <- function(
       smooth_names <- unlist(smooths)
       names(smooths) <- smooth_names
     }
-
-    print(smooths)
+    
     for (i in seq_along(smooths)) {
       # entry like list("cnisp" = 10) where k = 10
-      if (nchar(names(smooths)[i]) >= 1) {
+      if (is.numeric(smooths[[i]]) ) {
         smooth <- names(smooths[i])
         smooth_k <- smooths[[i]]
       } else { # entry like list("cnisp"), assume k = -1
