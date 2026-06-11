@@ -35,22 +35,39 @@ fit_gam <- function(
 
   if (length(smooths) > 0) {
     formula_terms <- vector(mode = "list", length = length(smooths))
-    for (smooth in names(smooths)) {
+    smooth_names <- names(smooths)
+
+    if (is.null(smooth_names)) {
+      smooth_names <- unlist(smooths)
+      names(smooths) <- smooth_names
+    }
+
+    print(smooths)
+    for (i in seq_along(smooths)) {
+      # entry like list("cnisp" = 10) where k = 10
+      if (nchar(names(smooths)[i]) >= 1) {
+        smooth <- names(smooths[i])
+        smooth_k <- smooths[[i]]
+      } else { # entry like list("cnisp"), assume k = -1
+        smooth <- smooths[[i]]
+        smooth_k <- -1
+      }
       if (!smooth %in% colnames(full_data)) {
         stop(paste0("Smoothing variable ", smooth, " not found in data."))
       }
-      if (is.null(smooths[[smooth]])) smooths[[smooth]] <- -1
       formula_term <- paste0(
-        "s(", smooth, ", bs = '", bs, "', k = ", smooths[[smooth]], ")"
+        "s(", smooth, ", bs = '", bs, "', k = ", smooth_k, ")"
       )
       formula_terms[[smooth]] <- formula_term
-
-      formula <- paste0("Y_train ~", paste(formula_terms, collapse = " + "))
     }
+    
+    formula_terms <- formula_terms[smooth_names]
+
+    formula <- paste0("Y_train ~ ", paste(formula_terms, collapse = " + "))
 
     for (term in colnames(full_data)[-1]) {
       if (!term %in% names(smooths)) {
-        formula <- paste0(formula, "+", term)
+        formula <- paste0(formula, " + ", term)
       }
     }
   } else {
@@ -61,7 +78,6 @@ fit_gam <- function(
   }
 
   formula <- as.formula(formula)
-
   fitted_GAM <- mgcv::gam(formula, data = full_data, family = family)
 
   XNowcast <- as.data.frame(X_nowcast)
