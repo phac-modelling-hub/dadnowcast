@@ -12,9 +12,15 @@ fit_mechanistic(
 )
 }
 \arguments{
-\item{X_train, Y_train, X_nowcast}{The data correspoding to DAD, CNISP, PTSOS, and RVDSS, respectively.}
+\item{Y_train}{The training data for the response variable DAD.}
 
-\item{params}{The parameters to use for the model. Must be a named list containing sc and sp and method (normal, poisson, or negbinom).}
+\item{X_train}{The training data for the explanatory variables CNISP, PTSOS, and RVDSS.
+Must be a matrix or data frame with three columns in the order of CNISP, PTSOS, and RVDSS.}
+
+\item{X_nowcast}{The RVDSS data used to nowcast the DAD values.}
+
+\item{params}{The parameters to use for the model.
+Must be a named list containing sc and sp and method (normal, poisson, or negbinom).}
 }
 \value{
 A list with the parameter estimates and the negative log-likelihood.

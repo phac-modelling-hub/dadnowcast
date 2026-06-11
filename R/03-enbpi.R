@@ -77,7 +77,11 @@ enbpi <- function(X_train, y_train, model, formula, params, k, batches = 40, tra
     y_test_k <- y_train[to_test]
 
     # Fit the model and get residuals
-    preds[[i]] <- dispatch_model(model)(X_train = X_train_k, Y_train = y_train_k, X_nowcast = X_test_k, params = params)$prediction$prediction
+    preds[[i]] <- dispatch_model(model)(
+      X_train = X_train_k, 
+      Y_train = y_train_k, 
+      X_nowcast = X_test_k, 
+      params = params)$prediction$prediction
     resids[[i]] <- y_test_k - preds[[i]]
 
     rmse[i] <- sqrt(mean((resids[[i]])^2))
